@@ -1,0 +1,73 @@
+name: Check for New GitHub Repositories
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Runs daily at 9 AM UTC
+  workflow_dispatch:       # Manual trigger
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-new-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for new repos and create issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OWNER="Naresh1401"
+          KNOWN_FILE=".known_repos"
+
+          # Fetch all public repo names
+          gh repo list "$OWNER" --visibility=public --limit 100 --json name --jq '.[].name' | sort > /tmp/current_repos.txt
+
+          # Load known repos (or empty if first run)
+          if [ -f "$KNOWN_FILE" ]; then
+            sort "$KNOWN_FILE" > /tmp/known_repos.txt
+          else
+            touch /tmp/known_repos.txt
+          fi
+
+          # Find new repos
+          NEW_REPOS=$(comm -23 /tmp/current_repos.txt /tmp/known_repos.txt)
+
+          if [ -n "$NEW_REPOS" ]; then
+            echo "New repositories detected:"
+            echo "$NEW_REPOS"
+
+            # Build issue body
+            BODY="## 🚀 New Repository Detected!\n\nThe following new repositories were found on your GitHub profile:\n\n"
+            while IFS= read -r repo; do
+              BODY+="- **[$repo](https://github.com/$OWNER/$repo)**\n"
+            done <<< "$NEW_REPOS"
+
+            BODY+="\n### Action Required\n"
+            BODY+="Would you like to add these project(s) to your portfolio website?\n\n"
+            BODY+="If yes, update \`index.html\` with the project details (description, tech stack, highlights) and push to \`main\`.\n\n"
+            BODY+="The site will auto-deploy to: **https://${OWNER}.github.io/personal-website/**"
+
+            # Create portfolio-update label if it doesn't exist
+            gh label create "portfolio-update" --repo "$OWNER/personal-website" --color "0E8A16" --description "New repo to potentially add to portfolio" 2>/dev/null || true
+
+            # Create GitHub issue
+            echo -e "$BODY" | gh issue create \
+              --repo "$OWNER/personal-website" \
+              --title "📦 New repo detected: $NEW_REPOS" \
+              --body-file -  \
+              --label "portfolio-update"
+
+            # Update known repos so we don't alert again
+            cp /tmp/current_repos.txt "$KNOWN_FILE"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "$KNOWN_FILE"
+            git commit -m "chore: update known repos list"
+            git push
+          else
+            echo "No new repositories found."
+          fi
