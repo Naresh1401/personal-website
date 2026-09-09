@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://naresh1401.github.io/personal-website/sitemap.xml

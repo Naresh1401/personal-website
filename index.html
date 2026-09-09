@@ -105,6 +105,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   background: rgba(11,17,33,0.88);
+  -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border);
   transition: padding 0.3s ease;
@@ -395,6 +396,7 @@ section.full { max-width: 100%; padding: 100px 0; }
   font-weight: 400;
   margin-top: 2px;
 }
+.fact-value.accent { color: var(--accent); }
 
 /* ──────────────────────────────────────────
    SKILLS
@@ -531,9 +533,12 @@ section.full { max-width: 100%; padding: 100px 0; }
 .meta-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: var(--muted);
+  background: var(--dot-color, var(--muted));
   flex-shrink: 0;
 }
+.icon-star { color: var(--yellow); }
+.icon-fork { color: var(--blue); }
+.icon-clock { color: var(--muted); }
 
 /* Loading skeleton */
 .skeleton {
@@ -544,6 +549,9 @@ section.full { max-width: 100%; padding: 100px 0; }
   height: 14px;
   margin: 6px 0;
 }
+.skeleton-title { width: 60%; height: 12px; }
+.skeleton-line { height: 10px; }
+.skeleton-line-80 { width: 80%; height: 10px; }
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
@@ -557,6 +565,8 @@ section.full { max-width: 100%; padding: 100px 0; }
   font-family: var(--ff-mono);
   font-size: 0.85rem;
 }
+.gh-error-icon { font-size: 2rem; display: block; margin-bottom: 12px; }
+.gh-error-link { color: var(--accent); display: block; margin-top: 8px; }
 
 /* GitHub Stats Bar */
 .gh-stats-bar {
@@ -648,6 +658,7 @@ section.full { max-width: 100%; padding: 100px 0; }
   width: 8px; height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  background: var(--dot-color, #8899aa);
 }
 .gh-lang-legend .lang-pct {
   color: var(--muted);
@@ -899,6 +910,7 @@ section.full { max-width: 100%; padding: 100px 0; }
   color: var(--accent);
   display: flex; align-items: center; gap: 6px;
 }
+.edu-tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* ──────────────────────────────────────────
    CERTIFICATIONS
@@ -1028,6 +1040,15 @@ section.full { max-width: 100%; padding: 100px 0; }
   align-self: flex-start;
 }
 .form-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(96,165,250,0.3); }
+.form-note { font-family: var(--ff-mono); font-size: 0.7rem; color: var(--muted); }
+.form-note a { color: var(--accent); }
+
+/* GitHub profile summary block */
+.gh-section { margin-top: 60px; }
+.gh-section-tag { margin-bottom: 12px; }
+.gh-heading { font-family: var(--ff-head); font-size: 1.6rem; font-weight: 700; margin-bottom: 32px; letter-spacing: -0.01em; }
+.gh-profile-link { color: var(--accent); font-size: 0.75rem; font-family: var(--ff-mono); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; vertical-align: middle; }
+.gh-subheading { font-family: var(--ff-mono); font-size: 0.75rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 20px; margin-top: 40px; }
 
 /* ──────────────────────────────────────────
    FOOTER
@@ -1197,10 +1218,11 @@ footer {
     <li><a href="#projects">Projects</a></li>
     <li><a href="#experience">Experience</a></li>
     <li><a href="#education">Education</a></li>
+    <li><a href="#certifications">Certifications</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="mailto:ns.apj1729@gmail.com" class="nav-cta">Hire Me</a>
-  <div class="hamburger" id="hamburger" onclick="toggleNav()">
+  <div class="hamburger" id="hamburger" onclick="toggleNav()" role="button" tabindex="0" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
     <span></span><span></span><span></span>
   </div>
 </nav>
@@ -1229,7 +1251,7 @@ footer {
         <div class="stat-label">LLM Apps<br>in Production</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">44<span>+</span></div>
+        <div class="stat-num"><span id="heroRepoCount">44</span><span>+</span></div>
         <div class="stat-label">Public GitHub<br>Repositories</div>
       </div>
       <div class="stat-item">
@@ -1239,9 +1261,9 @@ footer {
     </div>
     <div class="hero-btns">
       <a href="#projects" class="btn-primary">View Projects</a>
-      <a href="https://github.com/Naresh1401" target="_blank" class="btn-outline"><i class="fab fa-github"></i> &nbsp;GitHub</a>
-      <a href="https://www.linkedin.com/in/nareshsampangi1729/" target="_blank" class="btn-outline"><i class="fab fa-linkedin"></i> &nbsp;LinkedIn</a>
-      <a href="mailto:ns.apj1729@gmail.com" class="btn-outline"><i class="fas fa-file-download"></i> &nbsp;Resume</a>
+      <a href="https://github.com/Naresh1401" target="_blank" rel="noopener" class="btn-outline"><i class="fab fa-github"></i> &nbsp;GitHub</a>
+      <a href="https://www.linkedin.com/in/nareshsampangi1729/" target="_blank" rel="noopener" class="btn-outline"><i class="fab fa-linkedin"></i> &nbsp;LinkedIn</a>
+      <a href="resume.pdf" target="_blank" rel="noopener" class="btn-outline" download><i class="fas fa-file-download"></i> &nbsp;Resume</a>
     </div>
   </div>
 </section>
@@ -1309,7 +1331,7 @@ footer {
         <div class="fact-icon"><i class="fas fa-circle-check"></i></div>
         <div class="fact-info">
           <div class="fact-label">Availability</div>
-          <div class="fact-value" style="color: var(--accent);">✦ Open to Work</div>
+          <div class="fact-value accent">✦ Open to Work</div>
         </div>
       </div>
     </div>
@@ -1443,8 +1465,8 @@ footer {
         <li>Real-time NLI-based hallucination detection flags high-risk answers before reaching the user</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/Enterprise-Rag-Pipeline" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://enterprise-rag-pipeline.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/Enterprise-Rag-Pipeline" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://enterprise-rag-pipeline.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
 
@@ -1468,8 +1490,8 @@ footer {
         <li>Deployed on Render; also supports local LLMs via Ollama (Llama 3)</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/Agenticragchatbot" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://naresh-ragchat.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/Agenticragchatbot" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://naresh-ragchat.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
 
@@ -1489,8 +1511,8 @@ footer {
         <li>Human-in-the-loop review queue API routes low-confidence fields for manual correction</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/Intelligent-document-processing" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://intelligent-document-processing-qyo8.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/Intelligent-document-processing" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://intelligent-document-processing-qyo8.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
 
@@ -1510,8 +1532,8 @@ footer {
         <li>87% execution accuracy on single-table queries · 71% on multi-table joins</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/Text-to-SQL-agent" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://text-to-sql-agent-2za9.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/Text-to-SQL-agent" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://text-to-sql-agent-2za9.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
 
@@ -1532,8 +1554,8 @@ footer {
         <li>Automated red-team suite of 10 adversarial tests — 100% pass rate</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/LLM-safety-guardrails" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://llm-safety-guardrails.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/LLM-safety-guardrails" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://llm-safety-guardrails.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
 
@@ -1552,8 +1574,8 @@ footer {
         <li>Security checks catch SQL injection, hardcoded secrets, insecure auth, path traversal</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/AI-code-review-agent" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://ai-code-review-agent-bon1.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/AI-code-review-agent" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://ai-code-review-agent-bon1.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
 
@@ -1577,17 +1599,17 @@ footer {
         <li>Full observability stack — OpenTelemetry traces (Jaeger), Prometheus metrics, Grafana dashboards, W&amp;B tracking</li>
       </ul>
       <div class="fc-actions">
-        <a href="https://github.com/Naresh1401/agent-erp" target="_blank" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://agent-erp-3osf.onrender.com" target="_blank" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        <a href="https://github.com/Naresh1401/agent-erp" target="_blank" rel="noopener" class="fc-btn gh"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://agent-erp-3osf.onrender.com" target="_blank" rel="noopener" class="fc-btn demo"><i class="fas fa-external-link-alt"></i> Live Demo</a>
       </div>
     </div>
   </div>
 
   <!-- GitHub Profile Summary -->
-  <div style="margin-top: 60px;">
-    <div class="section-tag" style="margin-bottom: 12px;">// GitHub Profile</div>
-    <h3 style="font-family: var(--ff-head); font-size: 1.6rem; font-weight: 700; margin-bottom: 32px; letter-spacing: -0.01em;">
-      Open Source Activity &nbsp;<a href="https://github.com/Naresh1401" target="_blank" style="color: var(--accent); font-size: 0.75rem; font-family: var(--ff-mono); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; vertical-align: middle;">View Profile →</a>
+  <div class="gh-section">
+    <div class="section-tag gh-section-tag">// GitHub Profile</div>
+    <h3 class="gh-heading">
+      Open Source Activity &nbsp;<a href="https://github.com/Naresh1401" target="_blank" rel="noopener" class="gh-profile-link">View Profile →</a>
     </h3>
 
     <!-- GitHub Stats Bar -->
@@ -1637,11 +1659,11 @@ footer {
     </div>
 
     <!-- Repo Grid -->
-    <h4 style="font-family: var(--ff-mono); font-size: 0.75rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 20px; margin-top: 40px;">Latest Repositories</h4>
+    <h4 class="gh-subheading">Latest Repositories</h4>
     <div class="projects-grid" id="ghRepos">
-      <div class="project-card"><div class="skeleton" style="width:60%;height:12px;"></div><div class="skeleton" style="height:10px;"></div><div class="skeleton" style="width:80%;height:10px;"></div></div>
-      <div class="project-card"><div class="skeleton" style="width:60%;height:12px;"></div><div class="skeleton" style="height:10px;"></div><div class="skeleton" style="width:80%;height:10px;"></div></div>
-      <div class="project-card"><div class="skeleton" style="width:60%;height:12px;"></div><div class="skeleton" style="height:10px;"></div><div class="skeleton" style="width:80%;height:10px;"></div></div>
+      <div class="project-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line-80"></div></div>
+      <div class="project-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line-80"></div></div>
+      <div class="project-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line-80"></div></div>
     </div>
   </div>
 </section>
@@ -1730,7 +1752,7 @@ footer {
       <div class="edu-school">Wright State University, Raj Soin College of Business</div>
       <div class="edu-year">Dayton, OH</div>
       <div class="edu-extra"><i class="fas fa-award"></i> Merit Scholarship Awardee</div>
-      <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px;">
+      <div class="edu-tags">
         <span class="stack-tag">Business Analytics</span>
         <span class="stack-tag">Data Mining</span>
         <span class="stack-tag">Big Data Prediction</span>
@@ -1800,14 +1822,14 @@ footer {
             <div class="value">+1 (937) 516-0192</div>
           </div>
         </a>
-        <a href="https://www.linkedin.com/in/nareshsampangi1729/" target="_blank" class="contact-link">
+        <a href="https://www.linkedin.com/in/nareshsampangi1729/" target="_blank" rel="noopener" class="contact-link">
           <div class="cl-icon li"><i class="fab fa-linkedin"></i></div>
           <div class="cl-text">
             <div class="label">LinkedIn</div>
             <div class="value">linkedin.com/in/nareshsampangi1729</div>
           </div>
         </a>
-        <a href="https://github.com/Naresh1401" target="_blank" class="contact-link">
+        <a href="https://github.com/Naresh1401" target="_blank" rel="noopener" class="contact-link">
           <div class="cl-icon gh"><i class="fab fa-github"></i></div>
           <div class="cl-text">
             <div class="label">GitHub</div>
@@ -1837,6 +1859,7 @@ footer {
         <textarea name="message" placeholder="Tell me about the opportunity or project..."></textarea>
       </div>
       <button type="submit" class="form-submit">Send Message →</button>
+      <p class="form-note">Opens your email app. Prefer not to? Email directly at <a href="mailto:ns.apj1729@gmail.com">ns.apj1729@gmail.com</a>.</p>
     </form>
   </div>
 </section>
@@ -1936,7 +1959,8 @@ sections.forEach(s => navObserver.observe(s));
 
 // ── Mobile nav ───────────────────────────
 function toggleNav() {
-  document.getElementById('navLinks').classList.toggle('open');
+  const isOpen = document.getElementById('navLinks').classList.toggle('open');
+  document.getElementById('hamburger').setAttribute('aria-expanded', isOpen);
 }
 document.querySelectorAll('.nav-links a').forEach(a => {
   a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
@@ -1956,6 +1980,15 @@ const langColors = {
   Java:'#b07219', Ruby:'#701516', Rust:'#dea584', PHP:'#4F5D95',
 };
 
+// Escapes untrusted API text before it's placed into innerHTML (prevents stored XSS)
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+// Only allow https URLs into href attributes (blocks javascript: etc.)
+function safeUrl(url) {
+  return /^https:\/\//i.test(url || '') ? url : '#';
+}
+
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -1969,88 +2002,126 @@ function timeAgo(dateStr) {
   return Math.floor(months / 12) + 'y ago';
 }
 
+const GH_CACHE_KEY = 'gh_profile_cache_v1';
+const GH_CACHE_TTL = 60 * 60 * 1000; // 1h — avoids the 60 req/hr unauthenticated GitHub API rate limit
+
+// Sub-modules split from one larger training project + a couple of unpolished repos —
+// keep them public (with real descriptions) but don't let them crowd out other work in "Latest Repos"
+const EXCLUDE_REPOS = new Set([
+  'agentic-commerce-observability-dashboard', 'agentic-commerce-testing-evaluation',
+  'agentic-commerce-agent-guardrails', 'agentic-commerce-rbac-security',
+  'agentic-commerce-rag-policy-assistant', 'agentic-commerce-event-driven',
+  'agentic-commerce-partner-integrations', 'agentic-commerce-payment-safety',
+  'agentic-commerce-ucp-flow', 'agentic-commerce-multi-agent-system',
+  'agentic-commerce-single-shopping-agent', 'agentic-commerce-mcp-tools',
+  'agentic-commerce-openapi-contracts', 'agentic-commerce-auth-gateway',
+  'agentic-commerce-api-backend', 'agentic-commerce-capstone-demo',
+  'agentic-commerce-platform', 'enterprise-agentic-commerce-platform',
+  'backend-agentic-api-core-lab', 'agentic-commerce-delivery-pod-lab',
+  'partner-commerce-ecosystem-lab', 'agentic-ai-commerce-handbook',
+  'agentic-commerce-api-lab', 'CS-breach', 'Cybersecurity-',
+]);
+
 async function loadGitHub() {
   const container = document.getElementById('ghRepos');
+  let profile, allRepos;
   try {
-    const [profileRes, reposRes] = await Promise.all([
-      fetch('https://api.github.com/users/Naresh1401'),
-      fetch('https://api.github.com/users/Naresh1401/repos?sort=updated&per_page=100')
-    ]);
-    if (!profileRes.ok || !reposRes.ok) throw new Error('GitHub API error');
-    const profile = await profileRes.json();
-    const allRepos = await reposRes.json();
-    const repos = allRepos.filter(r => !r.fork);
-
-    // Profile stats
-    const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
-    const totalForks = repos.reduce((s, r) => s + r.forks_count, 0);
-    const languages = new Set(repos.map(r => r.language).filter(Boolean));
-    const joinYear = new Date(profile.created_at).getFullYear();
-
-    document.getElementById('ghRepoCount').textContent = profile.public_repos;
-    document.getElementById('ghStarCount').textContent = totalStars;
-    document.getElementById('ghForkCount').textContent = totalForks;
-    document.getElementById('ghLangCount').textContent = languages.size;
-    document.getElementById('ghJoinYear').textContent = joinYear;
-
-    // Language breakdown
-    const langCount = {};
-    repos.forEach(r => { if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1; });
-    const total = Object.values(langCount).reduce((a, b) => a + b, 0);
-    const sorted = Object.entries(langCount).sort((a, b) => b[1] - a[1]);
-
-    const langBar = document.getElementById('ghLangBar');
-    const langLegend = document.getElementById('ghLangLegend');
-    langBar.innerHTML = '';
-    langLegend.innerHTML = '';
-    sorted.forEach(([lang, count]) => {
-      const pct = ((count / total) * 100).toFixed(1);
-      const color = langColors[lang] || '#8899aa';
-      const seg = document.createElement('div');
-      seg.className = 'lang-segment';
-      seg.style.width = pct + '%';
-      seg.style.background = color;
-      seg.title = lang + ' ' + pct + '%';
-      langBar.appendChild(seg);
-
-      const item = document.createElement('div');
-      item.className = 'lang-item';
-      item.innerHTML = `<div class="lang-dot" style="background:${color}"></div>${lang} <span class="lang-pct">${pct}%</span>`;
-      langLegend.appendChild(item);
-    });
-
-    // Repo cards
-    container.innerHTML = '';
-    repos.slice(0, 9).forEach(repo => {
-      const color = langColors[repo.language] || '#8899aa';
-      const card = document.createElement('div');
-      card.className = 'project-card';
-      card.innerHTML = `
-        <div class="project-top">
-          <div class="project-icon"><i class="fab fa-github"></i></div>
-          <div class="project-links">
-            <a href="${repo.html_url}" target="_blank" class="project-link" title="GitHub" rel="noopener"><i class="fab fa-github"></i></a>
-            ${repo.homepage ? `<a href="${repo.homepage}" target="_blank" class="project-link" title="Live" rel="noopener"><i class="fas fa-external-link-alt"></i></a>` : ''}
-          </div>
-        </div>
-        <div class="project-name">${repo.name.replace(/-/g,' ').replace(/_/g,' ')}</div>
-        <div class="project-desc">${repo.description || 'No description available.'}</div>
-        ${repo.topics && repo.topics.length ? `<div class="project-tags">${repo.topics.slice(0,4).map(t=>`<span class="project-tag">${t}</span>`).join('')}</div>` : ''}
-        <div class="project-meta">
-          ${repo.language ? `<div class="meta-item"><div class="meta-dot" style="background:${color}"></div>${repo.language}</div>` : ''}
-          <div class="meta-item"><i class="fas fa-star" style="color:var(--yellow)"></i>&nbsp;${repo.stargazers_count}</div>
-          <div class="meta-item"><i class="fas fa-code-branch" style="color:var(--blue)"></i>&nbsp;${repo.forks_count}</div>
-          <div class="meta-item project-updated"><i class="fas fa-clock" style="color:var(--muted)"></i>&nbsp;${timeAgo(repo.updated_at)}</div>
-        </div>`;
-      container.appendChild(card);
-    });
+    const cached = JSON.parse(localStorage.getItem(GH_CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached.ts < GH_CACHE_TTL) {
+      ({ profile, allRepos } = cached);
+    } else {
+      const [profileRes, reposRes] = await Promise.all([
+        fetch('https://api.github.com/users/Naresh1401'),
+        fetch('https://api.github.com/users/Naresh1401/repos?sort=updated&per_page=100')
+      ]);
+      if (!profileRes.ok || !reposRes.ok) throw new Error('GitHub API error');
+      profile = await profileRes.json();
+      allRepos = await reposRes.json();
+      localStorage.setItem(GH_CACHE_KEY, JSON.stringify({ ts: Date.now(), profile, allRepos }));
+    }
   } catch {
-    container.innerHTML = `<div class="gh-error">
-      <i class="fab fa-github" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
-      Couldn't load repos right now.
-      <a href="https://github.com/Naresh1401" target="_blank" style="color:var(--accent);display:block;margin-top:8px;">View on GitHub →</a>
-    </div>`;
+    // Fall back to last cached data (even if stale) so a rate limit doesn't blank the section
+    const cached = JSON.parse(localStorage.getItem(GH_CACHE_KEY) || 'null');
+    if (cached) {
+      ({ profile, allRepos } = cached);
+    } else {
+      container.innerHTML = `<div class="gh-error">
+        <i class="fab fa-github gh-error-icon"></i>
+        Couldn't load repos right now.
+        <a href="https://github.com/Naresh1401" target="_blank" rel="noopener" class="gh-error-link">View on GitHub →</a>
+      </div>`;
+      return;
+    }
   }
+
+  const repos = allRepos.filter(r => !r.fork);
+
+  // Profile stats
+  const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+  const totalForks = repos.reduce((s, r) => s + r.forks_count, 0);
+  const languages = new Set(repos.map(r => r.language).filter(Boolean));
+  const joinYear = new Date(profile.created_at).getFullYear();
+
+  document.getElementById('ghRepoCount').textContent = profile.public_repos;
+  document.getElementById('ghStarCount').textContent = totalStars;
+  document.getElementById('ghForkCount').textContent = totalForks;
+  document.getElementById('ghLangCount').textContent = languages.size;
+  document.getElementById('ghJoinYear').textContent = joinYear;
+  const heroRepoCount = document.getElementById('heroRepoCount');
+  if (heroRepoCount) heroRepoCount.textContent = profile.public_repos;
+
+  // Language breakdown
+  const langCount = {};
+  repos.forEach(r => { if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1; });
+  const total = Object.values(langCount).reduce((a, b) => a + b, 0);
+  const sorted = Object.entries(langCount).sort((a, b) => b[1] - a[1]);
+
+  const langBar = document.getElementById('ghLangBar');
+  const langLegend = document.getElementById('ghLangLegend');
+  langBar.innerHTML = '';
+  langLegend.innerHTML = '';
+  sorted.forEach(([lang, count]) => {
+    const pct = ((count / total) * 100).toFixed(1);
+    const color = langColors[lang] || '#8899aa';
+    const seg = document.createElement('div');
+    seg.className = 'lang-segment';
+    seg.style.width = pct + '%';
+    seg.style.background = color;
+    seg.title = lang + ' ' + pct + '%';
+    langBar.appendChild(seg);
+
+    const item = document.createElement('div');
+    item.className = 'lang-item';
+    item.innerHTML = `<div class="lang-dot" style="--dot-color:${color}"></div>${escapeHtml(lang)} <span class="lang-pct">${pct}%</span>`;
+    langLegend.appendChild(item);
+  });
+
+  // Repo cards
+  container.innerHTML = '';
+  const featuredRepos = repos.filter(r => !EXCLUDE_REPOS.has(r.name));
+  featuredRepos.slice(0, 9).forEach(repo => {
+    const color = langColors[repo.language] || '#8899aa';
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.innerHTML = `
+      <div class="project-top">
+        <div class="project-icon"><i class="fab fa-github"></i></div>
+        <div class="project-links">
+          <a href="${safeUrl(repo.html_url)}" target="_blank" class="project-link" title="GitHub" rel="noopener"><i class="fab fa-github"></i></a>
+          ${repo.homepage ? `<a href="${safeUrl(repo.homepage)}" target="_blank" class="project-link" title="Live" rel="noopener"><i class="fas fa-external-link-alt"></i></a>` : ''}
+        </div>
+      </div>
+      <div class="project-name">${escapeHtml(repo.name.replace(/-/g,' ').replace(/_/g,' '))}</div>
+      <div class="project-desc">${escapeHtml(repo.description) || 'No description available.'}</div>
+      ${repo.topics && repo.topics.length ? `<div class="project-tags">${repo.topics.slice(0,4).map(t=>`<span class="project-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      <div class="project-meta">
+        ${repo.language ? `<div class="meta-item"><div class="meta-dot" style="--dot-color:${color}"></div>${escapeHtml(repo.language)}</div>` : ''}
+        <div class="meta-item"><i class="fas fa-star icon-star"></i>&nbsp;${repo.stargazers_count}</div>
+        <div class="meta-item"><i class="fas fa-code-branch icon-fork"></i>&nbsp;${repo.forks_count}</div>
+        <div class="meta-item project-updated"><i class="fas fa-clock icon-clock"></i>&nbsp;${timeAgo(repo.updated_at)}</div>
+      </div>`;
+    container.appendChild(card);
+  });
 }
 loadGitHub();
 
@@ -2060,7 +2131,8 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
   const data = new FormData(this);
   const subject = encodeURIComponent(data.get('subject') || 'Portfolio Inquiry');
   const body = encodeURIComponent(`Hi Naresh,\n\n${data.get('message')}\n\n— ${data.get('name')}\n${data.get('email')}`);
-  window.open(`mailto:ns.apj1729@gmail.com?subject=${subject}&body=${body}`);
+  // location.href (not window.open) avoids popup blockers on mobile/Safari
+  window.location.href = `mailto:ns.apj1729@gmail.com?subject=${subject}&body=${body}`;
 });
 </script>
 </body>
