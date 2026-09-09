@@ -191,6 +191,40 @@ nav.scrolled { padding: 12px 60px; }
   width: 100%;
 }
 
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero-photo-wrap {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  flex-shrink: 0;
+  opacity: 0;
+  animation: fadeUp 0.7s 0.3s forwards;
+}
+.hero-photo-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  opacity: 0.45;
+  filter: blur(24px);
+  z-index: -1;
+}
+.hero-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  display: block;
+}
+
 .hero-label {
   font-family: var(--ff-mono);
   font-size: 0.75rem;
@@ -910,7 +944,12 @@ section.full { max-width: 100%; padding: 100px 0; }
   color: var(--accent);
   display: flex; align-items: center; gap: 6px;
 }
+.edu-extra a { color: inherit; text-decoration: none; }
+.edu-extra a:hover { text-decoration: underline; }
 .edu-tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+.pub-companion { font-size: 0.85rem; color: var(--muted2); margin-top: 24px; }
+.pub-companion a { color: var(--accent); }
+.demo-note { font-family: var(--ff-mono); font-size: 0.75rem; color: var(--muted); margin-bottom: 32px; }
 
 /* ──────────────────────────────────────────
    CERTIFICATIONS
@@ -1119,6 +1158,8 @@ footer {
   .skills-wrapper { grid-template-columns: repeat(2, 1fr); }
   .projects-grid { grid-template-columns: repeat(2, 1fr); }
   .featured-grid { grid-template-columns: 1fr; }
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-photo-wrap { order: -1; width: 180px; height: 180px; margin: 0 auto; }
 }
 
 @media (max-width: 768px) {
@@ -1219,6 +1260,7 @@ footer {
     <li><a href="#experience">Experience</a></li>
     <li><a href="#education">Education</a></li>
     <li><a href="#certifications">Certifications</a></li>
+    <li><a href="#research">Research</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="mailto:ns.apj1729@gmail.com" class="nav-cta">Hire Me</a>
@@ -1234,6 +1276,8 @@ footer {
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
   <div class="hero-inner">
+  <div class="hero-grid">
+  <div class="hero-text">
     <p class="hero-label">// Generative AI Engineer</p>
     <h1 class="hero-name">
       Naresh<br>
@@ -1265,6 +1309,11 @@ footer {
       <a href="https://www.linkedin.com/in/nareshsampangi1729/" target="_blank" rel="noopener" class="btn-outline"><i class="fab fa-linkedin"></i> &nbsp;LinkedIn</a>
       <a href="resume.pdf" target="_blank" rel="noopener" class="btn-outline" download><i class="fas fa-file-download"></i> &nbsp;Resume</a>
     </div>
+  </div>
+  <div class="hero-photo-wrap">
+    <img src="profile.jpg" alt="Naresh Sampangi" class="hero-photo" onerror="this.parentElement.style.display='none'"/>
+  </div>
+  </div>
   </div>
 </section>
 
@@ -1444,6 +1493,7 @@ footer {
   <div class="section-tag">// 03 — Projects</div>
   <h2 class="section-title">Featured Work</h2>
   <div class="section-line"></div>
+  <p class="demo-note"><i class="fas fa-info-circle"></i> Live demos run on free-tier hosting and may take ~30s to wake up on first load.</p>
 
   <!-- Featured (manual, from resume) -->
   <div class="featured-grid reveal">
@@ -1799,12 +1849,40 @@ footer {
 <hr class="divider"/>
 
 <!-- ════════════════════════════════════════
+     RESEARCH
+════════════════════════════════════════ -->
+<section id="research">
+  <div class="section-tag">// 07 — Research</div>
+  <h2 class="section-title">Publications</h2>
+  <div class="section-line"></div>
+  <div class="edu-grid reveal">
+    <div class="edu-card">
+      <span class="edu-badge blue">Research Paper · March 2026</span>
+      <div class="edu-degree">Beyond the Breach: Human-State Drift Detection in Cybersecurity Governance</div>
+      <div class="edu-school">Naresh Sampangi, Dr. Anil K. Agarwal, Neeta Tambe — The Circle Research Collaborative</div>
+      <div class="edu-year">Target: Journal of Cybersecurity Governance & AI in Healthcare Security</div>
+      <div class="edu-extra"><i class="fas fa-file-alt"></i> <a href="https://github.com/Naresh1401/Research-Papers/blob/main/Beyond_the_Breach_Research_Paper.md" target="_blank" rel="noopener">Read paper →</a></div>
+    </div>
+    <div class="edu-card">
+      <span class="edu-badge blue">Research Paper · April 2026</span>
+      <div class="edu-degree">The Human Firewall: Why Every Breach Has a Human Signature First</div>
+      <div class="edu-school">Naresh Sampangi, Dr. Anil K. Agarwal, Neeta Tambe — The Circle Research Collaborative</div>
+      <div class="edu-year">Target: Journal of AI Governance in Cybersecurity & Healthcare Security</div>
+      <div class="edu-extra"><i class="fas fa-file-alt"></i> <a href="https://github.com/Naresh1401/Research-Papers/blob/main/The_Human_Firewall_Research_Paper.md" target="_blank" rel="noopener">Read paper →</a></div>
+    </div>
+  </div>
+  <p class="pub-companion">Companion implementation: <a href="https://github.com/Naresh1401/DriftGuard" target="_blank" rel="noopener">DriftGuard</a> — transformer-based human-state drift detection prototype.</p>
+</section>
+
+<hr class="divider"/>
+
+<!-- ════════════════════════════════════════
      CONTACT
 ════════════════════════════════════════ -->
 <section id="contact">
   <div class="contact-wrap reveal">
     <div class="contact-left">
-      <div class="section-tag">// 07 — Contact</div>
+      <div class="section-tag">// 08 — Contact</div>
       <h2>Let's Build<br><span>Something</span><br>Together</h2>
       <p>Open to full-time roles, contract work, and collaborations in Generative AI, LLM Engineering, and Machine Learning. Let's talk.</p>
       <div class="contact-links">
