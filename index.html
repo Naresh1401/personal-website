@@ -2549,6 +2549,10 @@ async function loadGitHubActivity() {
     return;
   }
   const relevant = events.filter(ev => activityIcons[ev.type]).slice(0, 5);
+  if (!relevant.length) {
+    list.innerHTML = '<div class="gh-activity-item">No recent public activity.</div>';
+    return;
+  }
   list.innerHTML = relevant.map(ev => `
     <div class="gh-activity-item">
       <div class="gh-activity-icon"><i class="fas ${activityIcons[ev.type]}"></i></div>
