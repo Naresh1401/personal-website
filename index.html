@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// Set theme before first paint to avoid a flash of the wrong theme
+(function () {
+  try {
+    var saved = localStorage.getItem('theme');
+    var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {}
+})();
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Naresh Sampangi — Generative AI Engineer</title>
@@ -44,12 +54,30 @@
   --blue:     #a78bfa;
   --yellow:   #fcd34d;
   --text:     #f0f4f8;
-  --muted:    #5a7394;
+  --muted:    #6d84a3;
   --muted2:   #94a3b8;
   --radius:   12px;
   --ff-head:  'Syne', sans-serif;
   --ff-body:  'IBM Plex Sans', sans-serif;
   --ff-mono:  'IBM Plex Mono', monospace;
+  --nav-bg:   rgba(11,17,33,0.88);
+}
+
+:root[data-theme='light'] {
+  --bg:       #f8fafc;
+  --bg2:      #eef2f7;
+  --bg3:      #e2e8f0;
+  --card:     #ffffff;
+  --border:   rgba(37,99,235,0.18);
+  --border2:  rgba(15,23,42,0.09);
+  --accent:   #2563eb;
+  --accent2:  #1d4ed8;
+  --accent3:  #3b82f6;
+  --blue:     #7c3aed;
+  --text:     #0f172a;
+  --muted:    #64748b;
+  --muted2:   #475569;
+  --nav-bg:   rgba(248,250,252,0.85);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,6 +90,7 @@ body {
   font-weight: 300;
   line-height: 1.7;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ANIMATED MESH GRADIENT BACKGROUND */
@@ -93,6 +122,13 @@ body::after {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
 
+/* Consistent visible focus indicator for keyboard navigation */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 /* ──────────────────────────────────────────
    NAV
 ────────────────────────────────────────── */
@@ -104,7 +140,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(11,17,33,0.88);
+  background: var(--nav-bg);
   -webkit-backdrop-filter: blur(24px);
   backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border);
@@ -147,6 +183,8 @@ nav.scrolled { padding: 12px 60px; }
   transition: background 0.2s, color 0.2s;
 }
 .nav-cta:hover { background: var(--accent); color: var(--bg); }
+
+.nav-actions { display: flex; align-items: center; gap: 12px; }
 
 .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
 .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); transition: 0.3s; }
@@ -1019,6 +1057,7 @@ section.full { max-width: 100%; padding: 100px 0; }
   text-decoration: none;
   transition: border-color 0.2s, transform 0.2s;
 }
+.cl-main { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; text-decoration: none; color: inherit; }
 .contact-link:hover { border-color: rgba(96,165,250,0.2); transform: translateX(4px); }
 .cl-icon {
   width: 36px; height: 36px;
@@ -1061,7 +1100,7 @@ section.full { max-width: 100%; padding: 100px 0; }
 .form-group input::placeholder,
 .form-group textarea::placeholder { color: var(--muted); }
 .form-group input:focus,
-.form-group textarea:focus { border-color: rgba(96,165,250,0.3); }
+.form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(96,165,250,0.2); }
 .form-group textarea { min-height: 130px; }
 .form-submit {
   font-family: var(--ff-mono);
@@ -1080,6 +1119,10 @@ section.full { max-width: 100%; padding: 100px 0; }
 }
 .form-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(96,165,250,0.3); }
 .form-note { font-family: var(--ff-mono); font-size: 0.7rem; color: var(--muted); }
+.form-status { font-family: var(--ff-mono); font-size: 0.75rem; min-height: 1em; }
+.form-status.success { color: var(--accent); }
+.form-status.error { color: #f87171; }
+:root[data-theme='light'] .form-status.error { color: #b91c1c; }
 .form-note a { color: var(--accent); }
 
 /* GitHub profile summary block */
@@ -1149,6 +1192,128 @@ footer {
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Staggered children (grids) get a per-index delay set via JS --stagger-i */
+.reveal .stagger-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: calc(var(--stagger-i, 0) * 70ms);
+}
+.reveal.visible .stagger-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ──────────────────────────────────────────
+   SCROLL PROGRESS BAR
+────────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+  z-index: 999;
+  transition: width 0.1s linear;
+}
+
+/* ──────────────────────────────────────────
+   THEME TOGGLE
+────────────────────────────────────────── */
+.theme-toggle {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { color: var(--accent); border-color: rgba(96,165,250,0.3); }
+:root[data-theme='light'] .theme-toggle .fa-moon,
+:root:not([data-theme='light']) .theme-toggle .fa-sun { display: none; }
+
+/* ──────────────────────────────────────────
+   COPY TO CLIPBOARD
+────────────────────────────────────────── */
+.copy-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 4px 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.copy-btn:hover { color: var(--accent); }
+.copy-btn.copied { color: var(--accent); }
+
+/* ──────────────────────────────────────────
+   PROJECT FILTER BAR
+────────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.filter-btn {
+  font-family: var(--ff-mono);
+  font-size: 0.7rem;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  border-radius: 20px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.filter-btn:hover { border-color: rgba(96,165,250,0.3); color: var(--accent); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.featured-card.filtered-out { display: none; }
+
+/* ──────────────────────────────────────────
+   GITHUB ACTIVITY FEED
+────────────────────────────────────────── */
+.gh-activity-list { display: flex; flex-direction: column; gap: 10px; }
+.gh-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 0.83rem;
+  color: var(--muted2);
+}
+.gh-activity-icon {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  background: rgba(96,165,250,0.08);
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.gh-activity-text a { color: var(--text); text-decoration: none; font-weight: 500; }
+.gh-activity-text a:hover { text-decoration: underline; }
+.gh-activity-time {
+  font-family: var(--ff-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ──────────────────────────────────────────
@@ -1236,7 +1401,7 @@ footer {
 
 /* Print styles */
 @media print {
-  nav, .back-to-top, .hero-glow, .hero-glow2, body::before { display: none !important; }
+  nav, .back-to-top, .hero-glow, .hero-glow2, body::before, .scroll-progress, .theme-toggle, .filter-bar { display: none !important; }
   body { background: #fff; color: #111; }
   section { padding: 20px 0; }
   .featured-card, .project-card, .edu-card, .cert-card, .tl-content, .fact-row, .skill-group {
@@ -1263,11 +1428,18 @@ footer {
     <li><a href="#research">Research</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <a href="mailto:ns.apj1729@gmail.com" class="nav-cta">Hire Me</a>
-  <div class="hamburger" id="hamburger" onclick="toggleNav()" role="button" tabindex="0" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
-    <span></span><span></span><span></span>
+  <div class="nav-actions">
+    <a href="mailto:ns.apj1729@gmail.com" class="nav-cta">Hire Me</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark theme" onclick="toggleTheme()">
+      <i class="fas fa-sun"></i>
+      <i class="fas fa-moon"></i>
+    </button>
+    <div class="hamburger" id="hamburger" onclick="toggleNav()" role="button" tabindex="0" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
+<div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- ════════════════════════════════════════
      HERO
@@ -1291,15 +1463,15 @@ footer {
     </p>
     <div class="hero-stats">
       <div class="stat-item">
-        <div class="stat-num">7<span>+</span></div>
+        <div class="stat-num"><span class="count-up" data-target="7">0</span><span>+</span></div>
         <div class="stat-label">LLM Apps<br>in Production</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num"><span id="heroRepoCount">44</span><span>+</span></div>
+        <div class="stat-num"><span id="heroRepoCount" class="count-up" data-target="44">0</span><span>+</span></div>
         <div class="stat-label">Public GitHub<br>Repositories</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">0.91</div>
+        <div class="stat-num"><span class="count-up" data-target="0.91" data-decimals="2">0.00</span></div>
         <div class="stat-label">RAGAS Answer<br>Relevancy Score</div>
       </div>
     </div>
@@ -1495,10 +1667,19 @@ footer {
   <div class="section-line"></div>
   <p class="demo-note"><i class="fas fa-info-circle"></i> Live demos run on free-tier hosting and may take ~30s to wake up on first load.</p>
 
+  <div class="filter-bar" id="projectFilterBar" role="group" aria-label="Filter projects by category">
+    <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-btn" data-filter="rag" aria-pressed="false">RAG</button>
+    <button class="filter-btn" data-filter="agents" aria-pressed="false">Agents</button>
+    <button class="filter-btn" data-filter="safety" aria-pressed="false">Safety</button>
+    <button class="filter-btn" data-filter="data" aria-pressed="false">Data / SQL</button>
+    <button class="filter-btn" data-filter="devtools" aria-pressed="false">Dev Tools</button>
+  </div>
+
   <!-- Featured (manual, from resume) -->
   <div class="featured-grid reveal">
     <!-- Enterprise RAG -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="rag">
       <div class="fc-header">
         <div class="fc-title">Enterprise RAG Pipeline with Evaluation & Hallucination Detection</div>
         <div class="fc-badges"><span class="badge-live">Live</span></div>
@@ -1521,7 +1702,7 @@ footer {
     </div>
 
     <!-- Agentic RAG -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="rag agents">
       <div class="fc-header">
         <div class="fc-title">Agentic RAG Chatbot</div>
         <div class="fc-badges">
@@ -1546,7 +1727,7 @@ footer {
     </div>
 
     <!-- IDP -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="data">
       <div class="fc-header">
         <div class="fc-title">Intelligent Document Processing (IDP) System</div>
         <div class="fc-badges"><span class="badge-live">Live</span></div>
@@ -1567,7 +1748,7 @@ footer {
     </div>
 
     <!-- Text-to-SQL -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="data agents">
       <div class="fc-header">
         <div class="fc-title">Text-to-SQL Agent with Self-Correction</div>
         <div class="fc-badges"><span class="badge-live">Live</span></div>
@@ -1588,7 +1769,7 @@ footer {
     </div>
 
     <!-- LLM Safety -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="safety">
       <div class="fc-header">
         <div class="fc-title">LLM Safety & Guardrails Layer</div>
         <div class="fc-badges"><span class="badge-live">Live</span></div>
@@ -1610,7 +1791,7 @@ footer {
     </div>
 
     <!-- AI Code Review -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="devtools agents">
       <div class="fc-header">
         <div class="fc-title">AI Code Review Agent</div>
       </div>
@@ -1630,7 +1811,7 @@ footer {
     </div>
 
     <!-- AgentERP -->
-    <div class="featured-card">
+    <div class="featured-card" data-categories="agents data">
       <div class="fc-header">
         <div class="fc-title">AgentERP — AI-Powered ERP Modernization Platform</div>
         <div class="fc-badges"><span class="badge-live">Live</span></div>
@@ -1706,6 +1887,12 @@ footer {
       <div class="gh-lang-title">Most Used Languages</div>
       <div class="gh-lang-bar" id="ghLangBar"></div>
       <div class="gh-lang-legend" id="ghLangLegend"></div>
+    </div>
+
+    <!-- Recent Activity -->
+    <h4 class="gh-subheading">Recent Activity</h4>
+    <div class="gh-activity-list" id="ghActivity">
+      <div class="gh-activity-item"><div class="skeleton skeleton-line-80"></div></div>
     </div>
 
     <!-- Repo Grid -->
@@ -1886,20 +2073,26 @@ footer {
       <h2>Let's Build<br><span>Something</span><br>Together</h2>
       <p>Open to full-time roles, contract work, and collaborations in Generative AI, LLM Engineering, and Machine Learning. Let's talk.</p>
       <div class="contact-links">
-        <a href="mailto:ns.apj1729@gmail.com" class="contact-link">
-          <div class="cl-icon email"><i class="fas fa-envelope"></i></div>
-          <div class="cl-text">
-            <div class="label">Email</div>
-            <div class="value">ns.apj1729@gmail.com</div>
-          </div>
-        </a>
-        <a href="tel:+19375160192" class="contact-link">
-          <div class="cl-icon phone"><i class="fas fa-phone"></i></div>
-          <div class="cl-text">
-            <div class="label">Phone</div>
-            <div class="value">+1 (937) 516-0192</div>
-          </div>
-        </a>
+        <div class="contact-link">
+          <a href="mailto:ns.apj1729@gmail.com" class="cl-main">
+            <div class="cl-icon email"><i class="fas fa-envelope"></i></div>
+            <div class="cl-text">
+              <div class="label">Email</div>
+              <div class="value">ns.apj1729@gmail.com</div>
+            </div>
+          </a>
+          <button class="copy-btn" data-copy="ns.apj1729@gmail.com" aria-label="Copy email address" title="Copy email"><i class="fas fa-copy"></i></button>
+        </div>
+        <div class="contact-link">
+          <a href="tel:+19375160192" class="cl-main">
+            <div class="cl-icon phone"><i class="fas fa-phone"></i></div>
+            <div class="cl-text">
+              <div class="label">Phone</div>
+              <div class="value">+1 (937) 516-0192</div>
+            </div>
+          </a>
+          <button class="copy-btn" data-copy="+19375160192" aria-label="Copy phone number" title="Copy phone"><i class="fas fa-copy"></i></button>
+        </div>
         <a href="https://www.linkedin.com/in/nareshsampangi1729/" target="_blank" rel="noopener" class="contact-link">
           <div class="cl-icon li"><i class="fab fa-linkedin"></i></div>
           <div class="cl-text">
@@ -1937,7 +2130,8 @@ footer {
         <textarea name="message" placeholder="Tell me about the opportunity or project..."></textarea>
       </div>
       <button type="submit" class="form-submit">Send Message →</button>
-      <p class="form-note">Opens your email app. Prefer not to? Email directly at <a href="mailto:ns.apj1729@gmail.com">ns.apj1729@gmail.com</a>.</p>
+      <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+      <p class="form-note">Prefer not to use the form? Email directly at <a href="mailto:ns.apj1729@gmail.com">ns.apj1729@gmail.com</a>.</p>
     </form>
   </div>
 </section>
@@ -1992,6 +2186,26 @@ footer {
      JS
 ════════════════════════════════════════ -->
 <script>
+// ── Theme toggle ─────────────────────────
+// data-theme is already set pre-paint by the inline script in <head>; this just wires the button.
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('theme', theme); } catch (e) {}
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'light' ? '#f8fafc' : '#0b1121');
+  const toggleBtn = document.getElementById('themeToggle');
+  if (toggleBtn) toggleBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  applyTheme(current === 'light' ? 'dark' : 'light');
+}
+// Sync the button's initial aria-pressed with the pre-paint theme set in <head>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById('themeToggle');
+  if (toggleBtn) toggleBtn.setAttribute('aria-pressed', document.documentElement.getAttribute('data-theme') === 'light' ? 'true' : 'false');
+});
+
 // ── Typewriter ──────────────────────────
 const lines = [
   'Generative AI Engineer',
@@ -2014,11 +2228,15 @@ function type() {
 }
 type();
 
-// ── Back to top ──────────────────────────
+// ── Back to top + scroll progress ────────
 const btt = document.getElementById('backToTop');
+const scrollProgress = document.getElementById('scrollProgress');
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 50);
   btt.classList.toggle('show', window.scrollY > 400);
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+  scrollProgress.style.width = pct + '%';
 });
 
 // ── Active nav link on scroll ────────────
@@ -2044,11 +2262,86 @@ document.querySelectorAll('.nav-links a').forEach(a => {
   a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
 });
 
-// ── Scroll reveal ────────────────────────
+// ── Scroll reveal (with staggered children) ──
 const ro = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+document.querySelectorAll('.reveal').forEach(container => {
+  Array.from(container.children).forEach((child, i) => {
+    child.classList.add('stagger-item');
+    child.style.setProperty('--stagger-i', i);
+  });
+  ro.observe(container);
+});
+
+// ── Count-up stats ───────────────────────
+function runCountUp(target) {
+  const end = parseFloat(target.dataset.target);
+  const decimals = parseInt(target.dataset.decimals || '0', 10);
+  const duration = 1200;
+  const start = performance.now();
+  // setTimeout (not requestAnimationFrame) so this still completes if the tab is backgrounded
+  function step() {
+    const progress = Math.min((performance.now() - start) / duration, 1);
+    const value = end * (1 - Math.pow(1 - progress, 3)); // ease-out
+    target.textContent = value.toFixed(decimals);
+    if (progress < 1) setTimeout(step, 16);
+    else target.textContent = end.toFixed(decimals);
+  }
+  step();
+}
+const countUpObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { runCountUp(entry.target); obs.unobserve(entry.target); }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.count-up').forEach(el => countUpObserver.observe(el));
+
+// ── Copy to clipboard ────────────────────
+document.querySelectorAll('.copy-btn[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.dataset.copy;
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    } catch {
+      // Clipboard API unavailable (e.g. insecure context) — select-friendly fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { copied = document.execCommand('copy'); } catch { copied = false; }
+      document.body.removeChild(ta);
+    }
+    if (!copied) return;
+    const icon = btn.querySelector('i');
+    const original = icon.className;
+    btn.classList.add('copied');
+    icon.className = 'fas fa-check';
+    setTimeout(() => { icon.className = original; btn.classList.remove('copied'); }, 1500);
+  });
+});
+
+// ── Project filter ───────────────────────
+const filterBar = document.getElementById('projectFilterBar');
+if (filterBar) {
+  const cards = document.querySelectorAll('.featured-card');
+  filterBar.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    filterBar.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    const filter = btn.dataset.filter;
+    cards.forEach(card => {
+      const cats = (card.dataset.categories || '').split(' ');
+      card.classList.toggle('filtered-out', filter !== 'all' && !cats.includes(filter));
+    });
+  });
+}
 
 // ── GitHub Profile + Repos ───────────────
 const langColors = {
@@ -2204,14 +2497,106 @@ async function loadGitHub() {
 }
 loadGitHub();
 
+// ── GitHub Recent Activity ───────────────
+const GH_ACTIVITY_CACHE_KEY = 'gh_activity_cache_v1';
+const activityIcons = {
+  PushEvent: 'fa-code-commit', PullRequestEvent: 'fa-code-pull-request',
+  CreateEvent: 'fa-plus', IssuesEvent: 'fa-circle-dot', ForkEvent: 'fa-code-branch',
+  WatchEvent: 'fa-star', ReleaseEvent: 'fa-tag',
+};
+function describeEvent(ev) {
+  const repo = ev.repo.name.split('/')[1] || ev.repo.name;
+  const repoLink = `<a href="${safeUrl('https://github.com/' + ev.repo.name)}" target="_blank" rel="noopener">${escapeHtml(repo)}</a>`;
+  switch (ev.type) {
+    case 'PushEvent': {
+      const n = ev.payload?.commits?.length || 1;
+      return `Pushed ${n} commit${n > 1 ? 's' : ''} to ${repoLink}`;
+    }
+    case 'PullRequestEvent':
+      return `${ev.payload?.action === 'opened' ? 'Opened' : 'Updated'} a pull request in ${repoLink}`;
+    case 'CreateEvent':
+      return `Created ${escapeHtml(ev.payload?.ref_type || 'repo')} in ${repoLink}`;
+    case 'IssuesEvent':
+      return `${escapeHtml(ev.payload?.action || 'Updated')} an issue in ${repoLink}`;
+    case 'ForkEvent':
+      return `Forked ${repoLink}`;
+    case 'ReleaseEvent':
+      return `Published a release in ${repoLink}`;
+    default:
+      return `Activity in ${repoLink}`;
+  }
+}
+async function loadGitHubActivity() {
+  const list = document.getElementById('ghActivity');
+  if (!list) return;
+  let events;
+  try {
+    const cached = JSON.parse(localStorage.getItem(GH_ACTIVITY_CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached.ts < GH_CACHE_TTL) {
+      events = cached.events;
+    } else {
+      const res = await fetch('https://api.github.com/users/Naresh1401/events/public?per_page=30');
+      if (!res.ok) throw new Error('GitHub events API error');
+      events = await res.json();
+      localStorage.setItem(GH_ACTIVITY_CACHE_KEY, JSON.stringify({ ts: Date.now(), events }));
+    }
+  } catch {
+    const cached = JSON.parse(localStorage.getItem(GH_ACTIVITY_CACHE_KEY) || 'null');
+    events = cached ? cached.events : null;
+  }
+  if (!events || !events.length) {
+    list.innerHTML = '<div class="gh-activity-item">No recent public activity.</div>';
+    return;
+  }
+  const relevant = events.filter(ev => activityIcons[ev.type]).slice(0, 5);
+  if (!relevant.length) {
+    list.innerHTML = '<div class="gh-activity-item">No recent public activity.</div>';
+    return;
+  }
+  list.innerHTML = relevant.map(ev => `
+    <div class="gh-activity-item">
+      <div class="gh-activity-icon"><i class="fas ${activityIcons[ev.type]}"></i></div>
+      <div class="gh-activity-text">${describeEvent(ev)}</div>
+      <div class="gh-activity-time">${timeAgo(ev.created_at)}</div>
+    </div>`).join('');
+}
+loadGitHubActivity();
+
 // ── Contact form ─────────────────────────
-document.getElementById('contactForm').addEventListener('submit', function(e) {
+// Set to a Formspree (or similar) endpoint to submit directly; leave empty to keep the mailto: fallback
+const FORM_ENDPOINT = '';
+const contactForm = document.getElementById('contactForm');
+const formStatus = document.getElementById('formStatus');
+contactForm.addEventListener('submit', async function (e) {
   e.preventDefault();
   const data = new FormData(this);
-  const subject = encodeURIComponent(data.get('subject') || 'Portfolio Inquiry');
-  const body = encodeURIComponent(`Hi Naresh,\n\n${data.get('message')}\n\n— ${data.get('name')}\n${data.get('email')}`);
-  // location.href (not window.open) avoids popup blockers on mobile/Safari
-  window.location.href = `mailto:ns.apj1729@gmail.com?subject=${subject}&body=${body}`;
+
+  if (!FORM_ENDPOINT) {
+    const subject = encodeURIComponent(data.get('subject') || 'Portfolio Inquiry');
+    const body = encodeURIComponent(`Hi Naresh,\n\n${data.get('message')}\n\n— ${data.get('name')}\n${data.get('email')}`);
+    // location.href (not window.open) avoids popup blockers on mobile/Safari
+    window.location.href = `mailto:ns.apj1729@gmail.com?subject=${subject}&body=${body}`;
+    return;
+  }
+
+  const submitBtn = this.querySelector('.form-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending…';
+  formStatus.textContent = '';
+  formStatus.className = 'form-status';
+  try {
+    const res = await fetch(FORM_ENDPOINT, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error('Submission failed');
+    formStatus.textContent = 'Thanks! Your message has been sent.';
+    formStatus.classList.add('success');
+    this.reset();
+  } catch {
+    formStatus.textContent = "Couldn't send — please email directly instead.";
+    formStatus.classList.add('error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Message →';
+  }
 });
 </script>
 </body>
