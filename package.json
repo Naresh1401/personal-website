@@ -1,0 +1,19 @@
+{
+  "name": "personal-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Naresh Sampangi — personal portfolio site (static HTML/CSS/JS, deployed via GitHub Pages)",
+  "scripts": {
+    "serve": "http-server . -p 8080 -c-1 -o",
+    "lint:html": "html-validate index.html 404.html",
+    "lint:css": "stylelint \"index.html\" --custom-syntax postcss-html",
+    "lint": "npm run lint:html && npm run lint:css"
+  },
+  "devDependencies": {
+    "html-validate": "^8.24.0",
+    "http-server": "^14.1.1",
+    "postcss-html": "^1.7.0",
+    "stylelint": "^16.9.0",
+    "stylelint-config-standard": "^36.0.1"
+  }
+}

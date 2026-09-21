@@ -20,8 +20,20 @@ Enhanced personal portfolio website with **automated deployment** and **reposito
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `deploy.yml` | Push to `main` | Automated GitHub Pages deployment |
-| `check-new-repos.yml` | Daily cron (9 AM UTC) | Monitors for new repos, creates issue to update portfolio |
+| `deploy.yml` | Push/PR to `main` | Lints HTML/CSS (`validate` job), then deploys to GitHub Pages on push (PRs only run validation) |
+| `check-new-repos.yml` | Daily cron (9 AM UTC) | Detects new repos, opens a PR to update `.known_repos` for manual review/merge, and files an issue |
+
+## Local Development
+
+Requires Node.js 18+.
+
+```bash
+npm install       # install dev tooling (one-time)
+npm run serve     # preview the site at http://localhost:8080
+npm run lint      # lint HTML (html-validate) and inline CSS (stylelint)
+```
+
+Run `npm run lint` before pushing — the same check runs in CI and blocks deployment if it fails.
 
 ## Tech Stack
 
@@ -39,11 +51,16 @@ Enhanced personal portfolio website with **automated deployment** and **reposito
 ```
 personal-website/
 ├── index.html                          # Portfolio page
+├── 404.html                            # Custom GitHub Pages 404
 ├── og-image.png                        # Social sharing preview image
 ├── .known_repos                        # Tracked repos for change detection
-└── .github/workflows/
-    ├── deploy.yml                      # Auto-deploy to GitHub Pages
-    └── check-new-repos.yml             # Daily new repo monitor
+├── package.json                        # Local lint/serve scripts
+├── .stylelintrc.json / .htmlvalidate.json
+└── .github/
+    ├── dependabot.yml                  # Keeps GitHub Actions versions updated
+    └── workflows/
+        ├── deploy.yml                  # Lint + deploy to GitHub Pages
+        └── check-new-repos.yml         # Daily new repo monitor (opens PR)
 ```
 
 ---

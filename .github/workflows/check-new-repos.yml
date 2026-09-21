@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   check-new-repos:
@@ -16,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check for new repos and create issue
+      - name: Check for new repos and open PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -40,7 +41,7 @@ jobs:
             echo "New repositories detected:"
             echo "$NEW_REPOS"
 
-            # Build issue body
+            # Build PR/issue body
             BODY="## 🚀 New Repository Detected!\n\nThe following new repositories were found on your GitHub profile:\n\n"
             while IFS= read -r repo; do
               BODY+="- **[$repo](https://github.com/$OWNER/$repo)**\n"
@@ -48,26 +49,36 @@ jobs:
 
             BODY+="\n### Action Required\n"
             BODY+="Would you like to add these project(s) to your portfolio website?\n\n"
-            BODY+="If yes, update \`index.html\` with the project details (description, tech stack, highlights) and push to \`main\`.\n\n"
-            BODY+="The site will auto-deploy to: **https://${OWNER}.github.io/personal-website/**"
+            BODY+="If yes, update \`index.html\` with the project details (description, tech stack, highlights) as part of reviewing this PR.\n\n"
+            BODY+="Merging this PR only updates the tracked-repos list (\`.known_repos\`) so you don't get re-notified; it does **not** change the live site by itself."
 
             # Create portfolio-update label if it doesn't exist
             gh label create "portfolio-update" --repo "$OWNER/personal-website" --color "0E8A16" --description "New repo to potentially add to portfolio" 2>/dev/null || true
 
-            # Create GitHub issue
+            # Create GitHub issue for visibility
             echo -e "$BODY" | gh issue create \
               --repo "$OWNER/personal-website" \
               --title "📦 New repo detected: $NEW_REPOS" \
               --body-file -  \
               --label "portfolio-update"
 
-            # Update known repos so we don't alert again
+            # Open a PR (instead of pushing to main directly) so the update can be reviewed/approved
+            BRANCH="bot/known-repos-update-${{ github.run_id }}"
             cp /tmp/current_repos.txt "$KNOWN_FILE"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
+            git checkout -b "$BRANCH"
             git add "$KNOWN_FILE"
             git commit -m "chore: update known repos list"
-            git push
+            git push origin "$BRANCH"
+
+            echo -e "$BODY" | gh pr create \
+              --repo "$OWNER/personal-website" \
+              --title "chore: update known repos list ($NEW_REPOS)" \
+              --body-file - \
+              --base main \
+              --head "$BRANCH" \
+              --label "portfolio-update"
           else
             echo "No new repositories found."
           fi
