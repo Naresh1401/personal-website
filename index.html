@@ -1319,15 +1319,10 @@ footer {
 /* ──────────────────────────────────────────
    RESPONSIVE
 ────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .skills-wrapper { grid-template-columns: repeat(2, 1fr); }
-  .projects-grid { grid-template-columns: repeat(2, 1fr); }
-  .featured-grid { grid-template-columns: 1fr; }
-  .hero-grid { grid-template-columns: 1fr; }
-  .hero-photo-wrap { order: -1; width: 180px; height: 180px; margin: 0 auto; }
-}
 
-@media (max-width: 768px) {
+/* Nav collapses to the hamburger earlier than the general mobile breakpoint below —
+   8 links + logo + CTA + theme toggle don't fit between ~769px and ~1150px otherwise. */
+@media (max-width: 1150px) {
   nav { padding: 16px 24px; }
   nav.scrolled { padding: 12px 24px; }
   .nav-links { display: none; }
@@ -1345,7 +1340,17 @@ footer {
   .nav-links.open a { font-size: 1.1rem; }
   .nav-cta { display: none; }
   .hamburger { display: flex; }
+}
 
+@media (max-width: 1024px) {
+  .skills-wrapper { grid-template-columns: repeat(2, 1fr); }
+  .projects-grid { grid-template-columns: repeat(2, 1fr); }
+  .featured-grid { grid-template-columns: 1fr; }
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-photo-wrap { order: -1; width: 180px; height: 180px; margin: 0 auto; }
+}
+
+@media (max-width: 768px) {
   .hero { padding: 100px 24px 60px; }
   section { padding: 70px 24px; }
   .section-inner { padding: 0 24px; }
