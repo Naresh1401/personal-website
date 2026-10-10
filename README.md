@@ -11,8 +11,9 @@ Enhanced personal portfolio website with **automated deployment** and **reposito
 
 ## Features
 
-- Animated mesh gradient background with glassmorphism design
-- Responsive project gallery with live demo links
+- Animated aurora hero with a live "agent console", glass nav and light/dark themes
+- Responsive project gallery with category filters, headline metrics and live demo links
+- Live GitHub stats, languages, activity and latest repos (cached to stay under the API rate limit)
 - Automated GitHub Pages deployment via GitHub Actions
 - **Daily repo monitor** — automatically detects new repos and creates GitHub issues suggesting portfolio additions
 
@@ -39,8 +40,10 @@ Run `npm run lint` before pushing — the same check runs in CI and blocks deplo
 
 - **HTML5** + **CSS3** (mesh gradients, custom properties)
 - **JavaScript** (vanilla)
-- **Google Fonts**: Syne, IBM Plex Sans, IBM Plex Mono
-- **Font Awesome** 6.5.0
+- **Google Fonts**: Syne, Geist, Geist Mono
+- **Icons**: inline SVG sprite from Lucide, Bootstrap Icons (GitHub/LinkedIn) and Simple Icons (ORCID)
+- **GSAP + ScrollTrigger** and **Lenis** for scroll motion and smooth scrolling (CDN, with SRI)
+- **cobe** (globe) and **ninja-keys** (⌘K palette), self-hosted in `vendor/`
 - **GitHub Actions** for CI/CD
 - **GitHub Pages** for hosting
 
@@ -53,6 +56,7 @@ personal-website/
 ├── index.html                          # Portfolio page
 ├── 404.html                            # Custom GitHub Pages 404
 ├── og-image.png                        # Social sharing preview image
+├── vendor/                             # Self-hosted cobe + ninja-keys bundles
 ├── .known_repos                        # Tracked repos for change detection
 ├── package.json                        # Local lint/serve scripts
 ├── .stylelintrc.json / .htmlvalidate.json
