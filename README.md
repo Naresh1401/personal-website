@@ -44,6 +44,7 @@ Run `npm run lint` before pushing — the same check runs in CI and blocks deplo
 - **Icons**: inline SVG sprite from Lucide, Bootstrap Icons (GitHub/LinkedIn) and Simple Icons (ORCID)
 - **GSAP + ScrollTrigger** and **Lenis** for scroll motion and smooth scrolling (CDN, with SRI)
 - **cobe** (globe) and **ninja-keys** (⌘K palette), self-hosted in `vendor/`
+- **Tippy.js** (glossary tooltips), **medium-zoom** (screenshot zoom), **Embla Carousel** (projects on phones) and GSAP **SplitText** (heading reveals)
 - **GitHub Actions** for CI/CD
 - **GitHub Pages** for hosting
 
@@ -56,6 +57,7 @@ personal-website/
 ├── index.html                          # Portfolio page
 ├── 404.html                            # Custom GitHub Pages 404
 ├── og-image.png                        # Social sharing preview image
+├── images/projects/                    # Live-demo screenshots (WebP thumbnail + @2x zoom)
 ├── vendor/                             # Self-hosted cobe + ninja-keys bundles
 ├── .known_repos                        # Tracked repos for change detection
 ├── package.json                        # Local lint/serve scripts

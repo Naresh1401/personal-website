@@ -77,6 +77,7 @@
   --shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 48px -28px rgba(0, 0, 0, 0.8);
   --shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 28px 64px -28px rgba(0, 0, 0, 0.9);
   --noise-opacity: 0.05;
+  --zoom-bg: rgba(5, 8, 16, 0.9);
   --radius-sm: 10px;
   --radius: 16px;
   --radius-lg: 22px;
@@ -117,6 +118,7 @@
   --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 14px 36px -22px rgba(15, 23, 42, 0.22);
   --shadow-hover: 0 2px 4px rgba(15, 23, 42, 0.05), 0 26px 52px -24px rgba(15, 23, 42, 0.3);
   --noise-opacity: 0.03;
+  --zoom-bg: rgba(246, 248, 252, 0.94);
 
   color-scheme: light;
 }
@@ -1194,25 +1196,29 @@ button { font: inherit; color: inherit; }
 .project-stack { margin-top: auto; }
 .project-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 18px; border-top: 1px solid var(--line); }
 
-/* Flagship project: full-width card with an evaluation panel */
+/* Flagship project: screenshot beside the write-up, RAGAS metrics as a strip below */
 .project--spotlight {
-  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
-  gap: 36px;
-  padding: 34px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-areas: "shot main" "panel panel";
+  gap: 28px 36px;
+  margin-bottom: 18px;
+  padding: 30px;
   background:
     radial-gradient(70% 120% at 100% 0%, color-mix(in srgb, var(--tone) 13%, transparent), transparent 60%),
     var(--card-bg),
     var(--surface);
 }
 .project--spotlight .project-title { font-family: var(--ff-display); font-size: clamp(1.4rem, 2.3vw, 1.85rem); font-weight: 700; line-height: 1.15; letter-spacing: -0.025em; }
-.spotlight-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.spotlight-shot { grid-area: shot; align-self: start; aspect-ratio: 16 / 10; }
+.spotlight-main { grid-area: main; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .spotlight-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 24px;
+  grid-area: panel;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 16px 28px;
+  padding: 22px 24px;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: color-mix(in srgb, var(--bg) 50%, transparent);
@@ -1241,7 +1247,8 @@ button { font: inherit; color: inherit; }
 }
 .js .meter-fill { transform: scaleX(0); }
 .js .is-visible .meter-fill { transform: scaleX(1); }
-.panel-stat { display: flex; align-items: center; gap: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+.spotlight-panel .panel-title { grid-column: 1 / -1; }
+.panel-stat { display: flex; align-items: center; gap: 14px; max-width: 280px; padding-left: 28px; border-left: 1px solid var(--line); }
 .panel-stat .metric-num { font-size: 2.2rem; }
 .approx { margin-right: 0.04em; font-family: var(--ff-body); font-weight: 600; }
 
@@ -1848,6 +1855,121 @@ ninja-keys {
 }
 
 /* ──────────────────────────────────────────
+   UI PLUGINS: MEDIUM-ZOOM, TIPPY, SPLITTEXT, EMBLA
+────────────────────────────────────────── */
+
+/* Project screenshots (click to enlarge with medium-zoom) */
+.shot {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background: var(--surface-2);
+  aspect-ratio: 16 / 9;
+  cursor: zoom-in;
+}
+.shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  transition: transform 0.7s var(--ease);
+}
+.shot:hover img { transform: scale(1.04); }
+.shot-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(5, 8, 16, 0.75);
+  color: #edf2fa;
+  font-size: 0.72rem;
+  font-weight: 500;
+  opacity: 0;
+  translate: 0 6px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: opacity 0.3s, translate 0.3s var(--ease);
+}
+.shot:hover .shot-hint,
+.shot:focus-visible .shot-hint { opacity: 1; translate: 0 0; }
+.medium-zoom-overlay,
+.medium-zoom-image--opened { z-index: 400; }
+.medium-zoom-image--opened { border-radius: 12px; box-shadow: 0 40px 120px -30px rgba(0, 0, 0, 0.7); }
+
+/* Glossary tooltips (Tippy.js): terms get a dotted underline once tooltips are wired up */
+.has-glossary .term {
+  border-radius: 3px;
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in srgb, var(--accent) 75%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: help;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+.has-glossary .term:hover,
+.has-glossary .term:focus-visible { color: var(--text); text-decoration-color: var(--accent); }
+
+/* Core rules from tippy.css, themed to the site (inverted surface for contrast) */
+[data-tippy-root] { max-width: calc(100vw - 16px); }
+.tippy-box {
+  position: relative;
+  border-radius: 10px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.5);
+  outline: 0;
+  transition-property: transform, visibility, opacity;
+}
+.tippy-box[data-animation='fade'][data-state='hidden'] { opacity: 0; }
+.tippy-content { position: relative; z-index: 1; padding: 10px 12px; }
+.tippy-content strong { display: block; margin-bottom: 2px; font-weight: 600; }
+.tippy-arrow { width: 16px; height: 16px; color: var(--text); }
+.tippy-arrow::before { content: ''; position: absolute; border-color: transparent; border-style: solid; }
+.tippy-box[data-placement^='top'] > .tippy-arrow { bottom: 0; }
+.tippy-box[data-placement^='top'] > .tippy-arrow::before { bottom: -7px; left: 0; border-width: 8px 8px 0; border-top-color: currentcolor; transform-origin: center top; }
+.tippy-box[data-placement^='bottom'] > .tippy-arrow { top: 0; }
+.tippy-box[data-placement^='bottom'] > .tippy-arrow::before { top: -7px; left: 0; border-width: 0 8px 8px; border-bottom-color: currentcolor; transform-origin: center bottom; }
+
+/* Phones: Embla turns the project grid into a swipeable carousel */
+.carousel-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.carousel-controls .icon-btn:disabled { opacity: 0.35; cursor: default; }
+.carousel-status { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.carousel-dots { display: flex; justify-content: center; }
+.carousel-dot {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.carousel-dot::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 8px;
+  width: 8px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line-2);
+  transition: left 0.35s var(--ease), width 0.35s var(--ease), background-color 0.3s;
+}
+.carousel-dot[aria-current='true']::before { left: 3px; width: 18px; background: var(--accent); }
+.carousel-count { color: var(--text-3); font-family: var(--ff-mono); font-size: 0.72rem; }
+
+/* ──────────────────────────────────────────
    SCROLL REVEAL + KEYFRAMES
 ────────────────────────────────────────── */
 
@@ -1855,6 +1977,7 @@ ninja-keys {
    Uses `translate` + fill-mode backwards so hover `transform`s keep working afterwards. */
 .js .reveal > :not(.is-visible) { opacity: 0; }
 .js .reveal > .is-visible { animation: revealUp 0.9s var(--ease) backwards; animation-delay: calc(var(--stagger-i, 0) * 75ms); }
+.js .reveal > .is-split { opacity: 1; animation: none; }
 
 /* Theme switch: circular reveal is driven from JS; disable the default cross-fade */
 ::view-transition-old(root),
@@ -1934,7 +2057,9 @@ ninja-keys {
   .about-grid, .exp-layout { grid-template-columns: minmax(0, 1fr); }
   .exp-head { position: static; margin-bottom: 8px; }
   .exp-head .section-title { font-size: clamp(2.1rem, 4.6vw, 3.5rem); }
-  .project--spotlight { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .project--spotlight { grid-template-columns: minmax(0, 1fr); grid-template-areas: "shot" "main" "panel"; gap: 24px; }
+  .spotlight-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .panel-stat { grid-column: 1 / -1; max-width: none; padding: 16px 0 0; border-top: 1px solid var(--line); border-left: 0; }
   .skills-grid, .repo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .oss-grid { grid-template-columns: minmax(0, 1fr); }
   .contact-panel { grid-template-columns: minmax(0, 1fr); }
@@ -1964,7 +2089,10 @@ ninja-keys {
   .step-detail { grid-column: 2 / -1; grid-row: 2; font-size: 0.72rem; }
   .projects-grid, .skills-grid, .repo-grid, .papers, .edu-grid, .cert-grid { grid-template-columns: minmax(0, 1fr); }
   .project, .project--spotlight { padding: 22px; }
-  .spotlight-panel { padding: 18px; }
+  .spotlight-panel { grid-template-columns: minmax(0, 1fr); padding: 18px; }
+  .has-carousel .projects-viewport { overflow: hidden; }
+  .has-carousel .projects-grid { display: flex; align-items: flex-start; gap: 12px; touch-action: pan-y pinch-zoom; }
+  .has-carousel .projects-grid > .project { flex: 0 0 88%; min-width: 0; }
   .projects-toolbar { flex-direction: column; align-items: stretch; }
   .filter-bar { flex-wrap: wrap; gap: 8px; padding: 0; overflow: visible; border: 0; border-radius: 0; background: none; }
   .filter-btn { border: 1px solid var(--line-2); background: color-mix(in srgb, var(--surface) 70%, transparent); }
@@ -2011,7 +2139,8 @@ ninja-keys {
 /* Print styles */
 @media print {
   .site-header, .mobile-menu, .scroll-progress, .bg-noise, .hero-bg, .hero-visual, .scroll-cue, .marquee,
-  .back-to-top, .toast, .projects-toolbar, .contact-form, .copy-btn, .oss, .globe-block, ninja-keys { display: none !important; }
+  .back-to-top, .toast, .projects-toolbar, .contact-form, .copy-btn, .oss, .globe-block, ninja-keys,
+  .carousel-controls, .shot-hint { display: none !important; }
   body { background: #fff; color: #111; }
   .hero { min-height: 0; padding: 0 0 24px; }
   .section { padding-block: 24px; }
@@ -2023,6 +2152,8 @@ ninja-keys {
 <body>
 <!-- Icon sprite. UI icons: Lucide (ISC, lucide.dev). GitHub/LinkedIn: Bootstrap Icons (MIT). ORCID: Simple Icons (CC0). -->
 <svg class="sprite" aria-hidden="true" focusable="false">
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></g></symbol>
+<symbol id="i-maximize-2" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></g></symbol>
 <symbol id="i-activity" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></g></symbol>
 <symbol id="i-arrow-right" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g></symbol>
 <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></g></symbol>
@@ -2191,7 +2322,7 @@ ninja-keys {
             <dd><span id="heroRepoCount" class="count-up" data-target="44">44</span><span class="stat-plus">+</span></dd>
           </div>
           <div class="stat">
-            <dt>RAGAS answer relevancy</dt>
+            <dt><span class="term" data-term="ragas">RAGAS</span> answer relevancy</dt>
             <dd><span class="count-up" data-target="0.91" data-decimals="2">0.91</span></dd>
           </div>
         </dl>
@@ -2254,9 +2385,9 @@ ninja-keys {
     </header>
     <div class="about-grid">
       <div class="about-text reveal">
-        <p class="lead">I'm a <strong>Generative AI Engineer</strong> with a strong background in building intelligent, production-ready AI systems. My work spans from enterprise-grade RAG pipelines to agentic chatbots, with a relentless focus on reliability, evaluation, and real-world impact.</p>
+        <p class="lead">I'm a <strong>Generative AI Engineer</strong> with a strong background in building intelligent, production-ready AI systems. My work spans from enterprise-grade <span class="term" data-term="rag">RAG</span> pipelines to agentic chatbots, with a relentless focus on reliability, evaluation, and real-world impact.</p>
         <p>I hold a <strong>Master's in Science (STEM)</strong> from Wright State University, which gives me a rare combination of deep technical fluency and business-driven perspective — every AI system I build is tied to measurable outcomes.</p>
-        <p>Proficient in <strong>Python, LangChain, LangGraph, FAISS, ChromaDB and FastAPI</strong>. Experienced in hybrid retrieval, prompt engineering, hallucination detection and RAGAS evaluation. Background in management consulting, A/B testing and predictive modeling.</p>
+        <p>Proficient in <strong>Python, LangChain, LangGraph, FAISS, ChromaDB and FastAPI</strong>. Experienced in <span class="term" data-term="hybrid">hybrid retrieval</span>, prompt engineering, hallucination detection and RAGAS evaluation. Background in management consulting, A/B testing and predictive modeling.</p>
         <p>With <strong><span data-gh-repos>44</span>+ public GitHub repositories</strong> spanning Gen AI, ML, NLP, Data Engineering and Analytics, I believe in building in the open and sharing knowledge with the community.</p>
       </div>
       <div class="bento reveal">
@@ -2342,211 +2473,252 @@ ninja-keys {
     </div>
     <p class="sr-only" id="filterStatus" role="status" aria-live="polite"></p>
 
-    <div class="projects-grid reveal" id="projectsGrid">
-      <!-- Enterprise RAG (flagship) -->
-      <article class="project project--spotlight card lift spot tone-blue" data-categories="rag">
-        <div class="spotlight-main">
-          <div class="project-head">
-            <span class="icon-tile"><svg class="icon i-layers" aria-hidden="true"><use href="#i-layers"/></svg></span>
-            <span class="project-cat">RAG · Evaluation</span>
-            <span class="badge-live">Live</span>
+    <!-- Enterprise RAG (flagship) -->
+    <div class="spotlight-wrap reveal">
+        <article class="project project--spotlight card lift spot tone-blue" data-categories="rag">
+          <button type="button" class="shot spotlight-shot" aria-label="Enlarge screenshot: Enterprise RAG Pipeline">
+            <img src="images/projects/enterprise-rag.webp" data-zoom-src="images/projects/enterprise-rag@2x.webp" alt="Enterprise RAG Pipeline demo: Chat with Documents view with a knowledge-base question box, top-K chunk control and a hallucination-check toggle" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="spotlight-main">
+            <div class="project-head">
+              <span class="icon-tile"><svg class="icon i-layers" aria-hidden="true"><use href="#i-layers"/></svg></span>
+              <span class="project-cat">RAG · Evaluation</span>
+              <span class="badge-live">Live</span>
+            </div>
+            <h3 class="project-title">Enterprise RAG Pipeline with Evaluation &amp; Hallucination Detection</h3>
+            <ul class="project-bullets">
+              <li>Combined <span class="term" data-term="bm25">BM25</span> sparse + dense embeddings via <span class="term" data-term="rrf">Reciprocal Rank Fusion</span> — improved <span class="term" data-term="recall">recall@5</span> by ~23%</li>
+              <li><span class="term" data-term="crossencoder">Cross-encoder reranking</span> with ms-marco-MiniLM; answers cite source filename and page number</li>
+              <li>Real-time <span class="term" data-term="nli">NLI</span>-based hallucination detection flags high-risk answers before reaching the user</li>
+            </ul>
+            <ul class="chips project-stack">
+              <li class="chip">Python</li><li class="chip">FastAPI</li><li class="chip">FAISS</li><li class="chip">BM25</li>
+              <li class="chip">OpenAI</li><li class="chip">RAGAS</li><li class="chip">Streamlit</li><li class="chip">Docker</li>
+            </ul>
+            <div class="project-actions">
+              <a href="https://github.com/Naresh1401/Enterprise-Rag-Pipeline" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+              <a href="https://enterprise-rag-pipeline.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
+            </div>
           </div>
-          <h3 class="project-title">Enterprise RAG Pipeline with Evaluation &amp; Hallucination Detection</h3>
+          <div class="spotlight-panel">
+            <p class="panel-title"><span>RAGAS evaluation</span><span>score</span></p>
+            <div class="meter">
+              <div class="meter-top"><span class="term" data-term="relevancy">Answer relevancy</span><span class="meter-val">0.91</span></div>
+              <div class="meter-track"><span class="meter-fill" style="width: 91%"></span></div>
+            </div>
+            <div class="meter">
+              <div class="meter-top"><span class="term" data-term="faithfulness">Faithfulness</span><span class="meter-val">0.85</span></div>
+              <div class="meter-track"><span class="meter-fill" style="width: 85%"></span></div>
+            </div>
+            <div class="meter">
+              <div class="meter-top"><span class="term" data-term="precision">Context precision</span><span class="meter-val">0.78</span></div>
+              <div class="meter-track"><span class="meter-fill" style="width: 78%"></span></div>
+            </div>
+            <div class="panel-stat">
+              <span class="metric-num"><span class="approx">~</span>23%</span>
+              <span class="metric-label">higher recall@5 from hybrid BM25 + dense retrieval</span>
+            </div>
+          </div>
+        </article>
+    </div>
+
+    <!-- On phones the remaining cards become a swipeable carousel (Embla) -->
+    <div class="projects-viewport" id="projectsViewport">
+      <div class="projects-grid reveal" id="projectsGrid">
+        <!-- Agentic RAG -->
+        <article class="project card lift spot tone-violet" data-categories="rag agents">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: Agentic RAG Chatbot">
+            <img src="images/projects/agentic-rag-chatbot.webp" data-zoom-src="images/projects/agentic-rag-chatbot@2x.webp" alt="Agentic RAG Chatbot demo: chat assistant with file upload, URL ingest and web-scraper panels in the sidebar" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="project-head">
+            <span class="icon-tile"><svg class="icon i-messages-square" aria-hidden="true"><use href="#i-messages-square"/></svg></span>
+            <span class="project-cat">RAG · Agents</span>
+            <span class="badge-live">Deployed</span>
+          </div>
+          <h3 class="project-title">Agentic RAG Chatbot</h3>
+          <div class="project-metric">
+            <span class="metric-num">6</span>
+            <span class="metric-label">file types with page-aware chunking and citation-backed responses</span>
+          </div>
           <ul class="project-bullets">
-            <li>Combined BM25 sparse + dense embeddings via Reciprocal Rank Fusion — improved recall@5 by ~23%</li>
-            <li>Cross-encoder reranking with ms-marco-MiniLM; answers cite source filename and page number</li>
-            <li>Real-time NLI-based hallucination detection flags high-risk answers before reaching the user</li>
+            <li>LangGraph <span class="term" data-term="react">ReAct</span> loop routes between vector search, SQL query and clarification tools</li>
+            <li>Input/output guardrails: <span class="term" data-term="pii">PII</span> redaction, injection detection, session-scoped memory</li>
+            <li>Deployed on Render; also supports local LLMs via Ollama (Llama 3)</li>
           </ul>
           <ul class="chips project-stack">
-            <li class="chip">Python</li><li class="chip">FastAPI</li><li class="chip">FAISS</li><li class="chip">BM25</li>
-            <li class="chip">OpenAI</li><li class="chip">RAGAS</li><li class="chip">Streamlit</li><li class="chip">Docker</li>
+            <li class="chip">LangGraph</li><li class="chip">ChromaDB</li><li class="chip">SQLite</li><li class="chip">FastAPI</li>
+            <li class="chip">Whisper</li><li class="chip">Docker</li><li class="chip">Render</li>
           </ul>
           <div class="project-actions">
-            <a href="https://github.com/Naresh1401/Enterprise-Rag-Pipeline" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-            <a href="https://enterprise-rag-pipeline.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
+            <a href="https://github.com/Naresh1401/Agenticragchatbot" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+            <a href="https://naresh-ragchat.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
           </div>
-        </div>
-        <div class="spotlight-panel">
-          <p class="panel-title"><span>RAGAS evaluation</span><span>score</span></p>
-          <div class="meter">
-            <div class="meter-top"><span>Answer relevancy</span><span class="meter-val">0.91</span></div>
-            <div class="meter-track"><span class="meter-fill" style="width: 91%"></span></div>
+        </article>
+
+        <!-- IDP -->
+        <article class="project card lift spot tone-cyan" data-categories="data">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: Intelligent Document Processing">
+            <img src="images/projects/idp.webp" data-zoom-src="images/projects/idp@2x.webp" alt="Intelligent Document Processing demo: document upload with auto-detected type, plus processing and review-queue metrics" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="project-head">
+            <span class="icon-tile"><svg class="icon i-scan-text" aria-hidden="true"><use href="#i-scan-text"/></svg></span>
+            <span class="project-cat">Document AI</span>
+            <span class="badge-live">Live</span>
           </div>
-          <div class="meter">
-            <div class="meter-top"><span>Faithfulness</span><span class="meter-val">0.85</span></div>
-            <div class="meter-track"><span class="meter-fill" style="width: 85%"></span></div>
+          <h3 class="project-title">Intelligent Document Processing (IDP) System</h3>
+          <div class="project-metric">
+            <span class="metric-num">70%+</span>
+            <span class="metric-label">of documents processed without human review</span>
           </div>
-          <div class="meter">
-            <div class="meter-top"><span>Context precision</span><span class="meter-val">0.78</span></div>
-            <div class="meter-track"><span class="meter-fill" style="width: 78%"></span></div>
+          <ul class="project-bullets">
+            <li>Schema-driven extraction with per-field confidence scoring</li>
+            <li>Hybrid classifier (keyword rules + LLM fallback) — 92%+ document type accuracy</li>
+            <li>Human-in-the-loop review queue API routes low-confidence fields for manual correction</li>
+          </ul>
+          <ul class="chips project-stack">
+            <li class="chip">OpenAI</li><li class="chip">FastAPI</li><li class="chip">Pydantic</li>
+            <li class="chip">pytesseract</li><li class="chip">Streamlit</li><li class="chip">Docker</li>
+          </ul>
+          <div class="project-actions">
+            <a href="https://github.com/Naresh1401/Intelligent-document-processing" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+            <a href="https://intelligent-document-processing-qyo8.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
           </div>
-          <div class="panel-stat">
-            <span class="metric-num"><span class="approx">~</span>23%</span>
-            <span class="metric-label">higher recall@5 from hybrid BM25 + dense retrieval</span>
+        </article>
+
+        <!-- Text-to-SQL -->
+        <article class="project card lift spot tone-amber" data-categories="data agents">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: Text-to-SQL Agent">
+            <img src="images/projects/text-to-sql.webp" data-zoom-src="images/projects/text-to-sql@2x.webp" alt="Text-to-SQL Agent demo: plain-English query box with example queries, a database table explorer and an SQL safety checker" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="project-head">
+            <span class="icon-tile"><svg class="icon i-database" aria-hidden="true"><use href="#i-database"/></svg></span>
+            <span class="project-cat">Agents · Data / SQL</span>
+            <span class="badge-live">Live</span>
           </div>
-        </div>
-      </article>
+          <h3 class="project-title">Text-to-SQL Agent with Self-Correction</h3>
+          <div class="project-metric">
+            <span class="metric-num">&lt;3%</span>
+            <span class="metric-label">query failure rate, down from ~25%, via the self-correction loop</span>
+          </div>
+          <ul class="project-bullets">
+            <li>Self-correction loop retries failed queries with error feedback</li>
+            <li>Safety layer blocks all destructive SQL ops (DROP, DELETE, INSERT, UPDATE)</li>
+            <li>87% execution accuracy on single-table queries · 71% on multi-table joins</li>
+          </ul>
+          <ul class="chips project-stack">
+            <li class="chip">OpenAI</li><li class="chip">FastAPI</li><li class="chip">PostgreSQL</li>
+            <li class="chip">Streamlit</li><li class="chip">Docker</li>
+          </ul>
+          <div class="project-actions">
+            <a href="https://github.com/Naresh1401/Text-to-SQL-agent" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+            <a href="https://text-to-sql-agent-2za9.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
+          </div>
+        </article>
 
-      <!-- Agentic RAG -->
-      <article class="project card lift spot tone-violet" data-categories="rag agents">
-        <div class="project-head">
-          <span class="icon-tile"><svg class="icon i-messages-square" aria-hidden="true"><use href="#i-messages-square"/></svg></span>
-          <span class="project-cat">RAG · Agents</span>
-          <span class="badge-live">Deployed</span>
-        </div>
-        <h3 class="project-title">Agentic RAG Chatbot</h3>
-        <div class="project-metric">
-          <span class="metric-num">6</span>
-          <span class="metric-label">file types with page-aware chunking and citation-backed responses</span>
-        </div>
-        <ul class="project-bullets">
-          <li>LangGraph ReAct loop routes between vector search, SQL query and clarification tools</li>
-          <li>Input/output guardrails: PII redaction, injection detection, session-scoped memory</li>
-          <li>Deployed on Render; also supports local LLMs via Ollama (Llama 3)</li>
-        </ul>
-        <ul class="chips project-stack">
-          <li class="chip">LangGraph</li><li class="chip">ChromaDB</li><li class="chip">SQLite</li><li class="chip">FastAPI</li>
-          <li class="chip">Whisper</li><li class="chip">Docker</li><li class="chip">Render</li>
-        </ul>
-        <div class="project-actions">
-          <a href="https://github.com/Naresh1401/Agenticragchatbot" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-          <a href="https://naresh-ragchat.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
-        </div>
-      </article>
+        <!-- LLM Safety -->
+        <article class="project card lift spot tone-rose" data-categories="safety">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: LLM Safety &amp; Guardrails">
+            <img src="images/projects/llm-safety.webp" data-zoom-src="images/projects/llm-safety@2x.webp" alt="LLM Safety and Guardrails demo: input and output safety-check form with block-rate, PII and injection counters" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="project-head">
+            <span class="icon-tile"><svg class="icon i-shield-check" aria-hidden="true"><use href="#i-shield-check"/></svg></span>
+            <span class="project-cat">Safety · Guardrails</span>
+            <span class="badge-live">Live</span>
+          </div>
+          <h3 class="project-title">LLM Safety &amp; Guardrails Layer</h3>
+          <div class="project-metric">
+            <span class="metric-num">&lt;10 ms</span>
+            <span class="metric-label">for 6 guard types — injection, PII, toxicity and topic enforcement</span>
+          </div>
+          <ul class="project-bullets">
+            <li>PII detector covers 7 data types; auto-redacts on both input and output</li>
+            <li>Catches 13 attack patterns including <span class="term" data-term="dan">DAN jailbreaks</span> and system prompt extraction</li>
+            <li>Automated <span class="term" data-term="redteam">red-team</span> suite of 10 adversarial tests — 100% pass rate</li>
+          </ul>
+          <ul class="chips project-stack">
+            <li class="chip">Python</li><li class="chip">FastAPI</li><li class="chip">NLP</li>
+            <li class="chip">Red-Team Testing</li><li class="chip">Streamlit</li><li class="chip">Docker</li>
+          </ul>
+          <div class="project-actions">
+            <a href="https://github.com/Naresh1401/LLM-safety-guardrails" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+            <a href="https://llm-safety-guardrails.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
+          </div>
+        </article>
 
-      <!-- IDP -->
-      <article class="project card lift spot tone-cyan" data-categories="data">
-        <div class="project-head">
-          <span class="icon-tile"><svg class="icon i-scan-text" aria-hidden="true"><use href="#i-scan-text"/></svg></span>
-          <span class="project-cat">Document AI</span>
-          <span class="badge-live">Live</span>
-        </div>
-        <h3 class="project-title">Intelligent Document Processing (IDP) System</h3>
-        <div class="project-metric">
-          <span class="metric-num">70%+</span>
-          <span class="metric-label">of documents processed without human review</span>
-        </div>
-        <ul class="project-bullets">
-          <li>Schema-driven extraction with per-field confidence scoring</li>
-          <li>Hybrid classifier (keyword rules + LLM fallback) — 92%+ document type accuracy</li>
-          <li>Human-in-the-loop review queue API routes low-confidence fields for manual correction</li>
-        </ul>
-        <ul class="chips project-stack">
-          <li class="chip">OpenAI</li><li class="chip">FastAPI</li><li class="chip">Pydantic</li>
-          <li class="chip">pytesseract</li><li class="chip">Streamlit</li><li class="chip">Docker</li>
-        </ul>
-        <div class="project-actions">
-          <a href="https://github.com/Naresh1401/Intelligent-document-processing" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-          <a href="https://intelligent-document-processing-qyo8.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
-        </div>
-      </article>
+        <!-- AI Code Review -->
+        <article class="project card lift spot tone-green" data-categories="devtools agents">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: AI Code Review Agent">
+            <img src="images/projects/ai-code-review.webp" data-zoom-src="images/projects/ai-code-review@2x.webp" alt="AI Code Review Agent demo: form for submitting a pull request diff for automated review, with review stats in the sidebar" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="project-head">
+            <span class="icon-tile"><svg class="icon i-git-pull-request" aria-hidden="true"><use href="#i-git-pull-request"/></svg></span>
+            <span class="project-cat">Agents · Dev Tools</span>
+          </div>
+          <h3 class="project-title">AI Code Review Agent</h3>
+          <div class="project-metric">
+            <span class="metric-num">7</span>
+            <span class="metric-label">issue categories (security, bugs, performance, style, testing) with severity scores</span>
+          </div>
+          <ul class="project-bullets">
+            <li>Hooks into GitHub via webhooks — posts inline PR comments and approve/request-changes verdicts</li>
+            <li>Security checks catch SQL injection, hardcoded secrets, insecure auth, path traversal</li>
+          </ul>
+          <ul class="chips project-stack">
+            <li class="chip">OpenAI</li><li class="chip">FastAPI</li><li class="chip">GitHub Webhooks</li>
+            <li class="chip">Streamlit</li><li class="chip">Docker</li>
+          </ul>
+          <div class="project-actions">
+            <a href="https://github.com/Naresh1401/AI-code-review-agent" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+            <a href="https://ai-code-review-agent-bon1.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
+          </div>
+        </article>
 
-      <!-- Text-to-SQL -->
-      <article class="project card lift spot tone-amber" data-categories="data agents">
-        <div class="project-head">
-          <span class="icon-tile"><svg class="icon i-database" aria-hidden="true"><use href="#i-database"/></svg></span>
-          <span class="project-cat">Agents · Data / SQL</span>
-          <span class="badge-live">Live</span>
-        </div>
-        <h3 class="project-title">Text-to-SQL Agent with Self-Correction</h3>
-        <div class="project-metric">
-          <span class="metric-num">&lt;3%</span>
-          <span class="metric-label">query failure rate, down from ~25%, via the self-correction loop</span>
-        </div>
-        <ul class="project-bullets">
-          <li>Self-correction loop retries failed queries with error feedback</li>
-          <li>Safety layer blocks all destructive SQL ops (DROP, DELETE, INSERT, UPDATE)</li>
-          <li>87% execution accuracy on single-table queries · 71% on multi-table joins</li>
-        </ul>
-        <ul class="chips project-stack">
-          <li class="chip">OpenAI</li><li class="chip">FastAPI</li><li class="chip">PostgreSQL</li>
-          <li class="chip">Streamlit</li><li class="chip">Docker</li>
-        </ul>
-        <div class="project-actions">
-          <a href="https://github.com/Naresh1401/Text-to-SQL-agent" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-          <a href="https://text-to-sql-agent-2za9.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
-        </div>
-      </article>
-
-      <!-- LLM Safety -->
-      <article class="project card lift spot tone-rose" data-categories="safety">
-        <div class="project-head">
-          <span class="icon-tile"><svg class="icon i-shield-check" aria-hidden="true"><use href="#i-shield-check"/></svg></span>
-          <span class="project-cat">Safety · Guardrails</span>
-          <span class="badge-live">Live</span>
-        </div>
-        <h3 class="project-title">LLM Safety &amp; Guardrails Layer</h3>
-        <div class="project-metric">
-          <span class="metric-num">&lt;10 ms</span>
-          <span class="metric-label">for 6 guard types — injection, PII, toxicity and topic enforcement</span>
-        </div>
-        <ul class="project-bullets">
-          <li>PII detector covers 7 data types; auto-redacts on both input and output</li>
-          <li>Catches 13 attack patterns including DAN jailbreaks and system prompt extraction</li>
-          <li>Automated red-team suite of 10 adversarial tests — 100% pass rate</li>
-        </ul>
-        <ul class="chips project-stack">
-          <li class="chip">Python</li><li class="chip">FastAPI</li><li class="chip">NLP</li>
-          <li class="chip">Red-Team Testing</li><li class="chip">Streamlit</li><li class="chip">Docker</li>
-        </ul>
-        <div class="project-actions">
-          <a href="https://github.com/Naresh1401/LLM-safety-guardrails" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-          <a href="https://llm-safety-guardrails.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
-        </div>
-      </article>
-
-      <!-- AI Code Review -->
-      <article class="project card lift spot tone-green" data-categories="devtools agents">
-        <div class="project-head">
-          <span class="icon-tile"><svg class="icon i-git-pull-request" aria-hidden="true"><use href="#i-git-pull-request"/></svg></span>
-          <span class="project-cat">Agents · Dev Tools</span>
-        </div>
-        <h3 class="project-title">AI Code Review Agent</h3>
-        <div class="project-metric">
-          <span class="metric-num">7</span>
-          <span class="metric-label">issue categories (security, bugs, performance, style, testing) with severity scores</span>
-        </div>
-        <ul class="project-bullets">
-          <li>Hooks into GitHub via webhooks — posts inline PR comments and approve/request-changes verdicts</li>
-          <li>Security checks catch SQL injection, hardcoded secrets, insecure auth, path traversal</li>
-        </ul>
-        <ul class="chips project-stack">
-          <li class="chip">OpenAI</li><li class="chip">FastAPI</li><li class="chip">GitHub Webhooks</li>
-          <li class="chip">Streamlit</li><li class="chip">Docker</li>
-        </ul>
-        <div class="project-actions">
-          <a href="https://github.com/Naresh1401/AI-code-review-agent" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-          <a href="https://ai-code-review-agent-bon1.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
-        </div>
-      </article>
-
-      <!-- AgentERP -->
-      <article class="project card lift spot tone-blue" data-categories="agents data">
-        <div class="project-head">
-          <span class="icon-tile"><svg class="icon i-workflow" aria-hidden="true"><use href="#i-workflow"/></svg></span>
-          <span class="project-cat">Multi-agent · Data</span>
-          <span class="badge-live">Live</span>
-        </div>
-        <h3 class="project-title">AgentERP — AI-Powered ERP Modernization Platform</h3>
-        <div class="project-metric">
-          <span class="metric-num">4</span>
-          <span class="metric-label">autonomous LangGraph agents — Document Processor, Order, Inventory Intelligence and Migration</span>
-        </div>
-        <ul class="project-bullets">
-          <li>Each agent runs a multi-node state graph; a central orchestrator dispatches tasks to a Redis-backed async worker</li>
-          <li>Dual vector stores: pgvector for structured similarity search + Qdrant for semantic document retrieval</li>
-          <li>Full observability stack — OpenTelemetry traces (Jaeger), Prometheus metrics, Grafana dashboards, W&amp;B tracking</li>
-        </ul>
-        <ul class="chips project-stack">
-          <li class="chip">LangGraph</li><li class="chip">FastAPI</li><li class="chip">PostgreSQL + pgvector</li><li class="chip">Qdrant</li>
-          <li class="chip">Redis</li><li class="chip">OpenAI GPT-4o</li><li class="chip">React</li><li class="chip">Docker</li>
-          <li class="chip">dbt</li><li class="chip">OpenTelemetry</li>
-        </ul>
-        <div class="project-actions">
-          <a href="https://github.com/Naresh1401/agent-erp" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-          <a href="https://agent-erp-3osf.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
-        </div>
-      </article>
+        <!-- AgentERP -->
+        <article class="project card lift spot tone-blue" data-categories="agents data">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: AgentERP">
+            <img src="images/projects/agent-erp.webp" data-zoom-src="images/projects/agent-erp@2x.webp" alt="AgentERP demo: ERP dashboard with order, product, customer, agent-task and anomaly counters" width="800" height="500" loading="lazy" decoding="async"/>
+            <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
+          </button>
+          <div class="project-head">
+            <span class="icon-tile"><svg class="icon i-workflow" aria-hidden="true"><use href="#i-workflow"/></svg></span>
+            <span class="project-cat">Multi-agent · Data</span>
+            <span class="badge-live">Live</span>
+          </div>
+          <h3 class="project-title">AgentERP — AI-Powered ERP Modernization Platform</h3>
+          <div class="project-metric">
+            <span class="metric-num">4</span>
+            <span class="metric-label">autonomous LangGraph agents — Document Processor, Order, Inventory Intelligence and Migration</span>
+          </div>
+          <ul class="project-bullets">
+            <li>Each agent runs a multi-node state graph; a central orchestrator dispatches tasks to a Redis-backed async worker</li>
+            <li>Dual vector stores: <span class="term" data-term="pgvector">pgvector</span> for structured similarity search + Qdrant for semantic document retrieval</li>
+            <li>Full observability stack — <span class="term" data-term="otel">OpenTelemetry</span> traces (Jaeger), Prometheus metrics, Grafana dashboards, W&amp;B tracking</li>
+          </ul>
+          <ul class="chips project-stack">
+            <li class="chip">LangGraph</li><li class="chip">FastAPI</li><li class="chip">PostgreSQL + pgvector</li><li class="chip">Qdrant</li>
+            <li class="chip">Redis</li><li class="chip">OpenAI GPT-4o</li><li class="chip">React</li><li class="chip">Docker</li>
+            <li class="chip">dbt</li><li class="chip">OpenTelemetry</li>
+          </ul>
+          <div class="project-actions">
+            <a href="https://github.com/Naresh1401/agent-erp" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+            <a href="https://agent-erp-3osf.onrender.com" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Live demo</a>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="carousel-controls" id="projectsControls" hidden>
+      <button type="button" class="icon-btn" data-dir="prev" aria-label="Previous project"><svg class="icon i-arrow-left" aria-hidden="true"><use href="#i-arrow-left"/></svg></button>
+      <div class="carousel-status">
+        <div class="carousel-dots"></div>
+        <span class="carousel-count" aria-live="polite"></span>
+      </div>
+      <button type="button" class="icon-btn" data-dir="next" aria-label="Next project"><svg class="icon i-arrow-right" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
     </div>
 
     <!-- GitHub Profile Summary -->
@@ -3055,6 +3227,13 @@ ninja-keys {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js" integrity="sha384-jqpi9VmOdhyLoLURgjCn7EpnG9BbnHW57ibIZoeaIU+erWDH3k8fQQg0xH2ySjnw" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 
+<!-- UI plugins: SplitText (GSAP), Tippy.js + Popper (tooltips), medium-zoom (screenshots), Embla Carousel (phones) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/SplitText.min.js" integrity="sha384-SWJ0lLVRoipvHh59xj0pL7uC7Ih51F+5smaFtrG+2nr+TlDZU5SYJHmxfolbeNTr" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy.umd.min.js" integrity="sha384-pjtv4LzKGI/lGxchW/wd/upB/HsGOP/Q2iPYyDU8qo2bp4JLbN34hQkdAArvidZX" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" integrity="sha384-o0gqi06am9fKVfa/jWO8/UE7OxHG6t+fgq/XaASsuwT8OBsFcxN7YhjtqyTfIxtS" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/embla-carousel@8.6.0/embla-carousel.umd.js" integrity="sha384-XGqLM9+dJ+PFOMZn6IuZgRRIoxcAT5fx4eIZCx7K3O2Dj5RA7EOlJ3yOS8Jd+kiY" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json">
 {
@@ -3094,6 +3273,8 @@ const reduceMotion = () => motionQuery.matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 // Set by initMotion() when Lenis smooth scrolling is running (desktop, motion allowed)
 let lenis = null;
+// Set by initCarousel() when Embla is available; the project filter refreshes it
+let projectsCarousel = null;
 
 // Scrolls to an element through Lenis when it's active (Lenis honors html's scroll-padding-top for the nav offset)
 function scrollToTarget(el) {
@@ -3370,7 +3551,7 @@ document.querySelectorAll('.copy-btn[data-copy]').forEach(btn => {
 // ── Project filter ───────────────────────
 const filterBar = document.getElementById('projectFilterBar');
 if (filterBar) {
-  const cards = Array.from(document.querySelectorAll('#projectsGrid .project'));
+  const cards = Array.from(document.querySelectorAll('#projects .project'));
   const filterStatus = document.getElementById('filterStatus');
   const matches = (card, filter) => filter === 'all' || (card.dataset.categories || '').split(' ').includes(filter);
   // Keep the per-filter counts honest if cards are added or re-tagged
@@ -3380,6 +3561,7 @@ if (filterBar) {
   });
   function applyFilter(filter) {
     cards.forEach(card => card.classList.toggle('filtered-out', !matches(card, filter)));
+    if (projectsCarousel) projectsCarousel.refresh();
   }
   filterBar.addEventListener('click', (e) => {
     const btn = e.target.closest('.filter-btn');
@@ -3942,7 +4124,7 @@ function paletteActions() {
     ['skills', 'Skills', 'boxes'], ['research', 'Research', 'file-text'], ['education', 'Education', 'graduation-cap'],
     ['contact', 'Contact', 'mail'],
   ].map(([id, title, icon]) => ({ id: 'go-' + id, title, section: 'Go to', icon: inlineIcon(icon), handler: () => scrollToTarget(document.getElementById(id)) }));
-  const demos = Array.from(document.querySelectorAll('#projectsGrid .project')).map((card, i) => {
+  const demos = Array.from(document.querySelectorAll('#projects .project')).map((card, i) => {
     const demo = card.querySelector('.link-btn--accent');
     return demo && {
       id: 'demo-' + i,
@@ -3983,11 +4165,158 @@ function initCommandPalette() {
   else setTimeout(load, 2000);
 }
 
+// ── Project screenshots: click to enlarge (francoischalifour/medium-zoom) ──
+// Each screenshot sits in a button so keyboards can open it too; without the library it opens the full image.
+function initZoom() {
+  const shots = Array.from(document.querySelectorAll('.shot'));
+  if (!shots.length) return;
+  const zoom = window.mediumZoom
+    ? window.mediumZoom(shots.map((shot) => shot.querySelector('img')), { margin: 24, background: 'var(--zoom-bg)', scrollOffset: 60 })
+    : null;
+  shots.forEach((shot) => {
+    const img = shot.querySelector('img');
+    shot.addEventListener('click', (e) => {
+      if (zoom && e.target === img) return; // medium-zoom handles clicks on the image itself
+      if (zoom) zoom.open({ target: img });
+      else window.open(img.dataset.zoomSrc || img.src, '_blank', 'noopener');
+    });
+  });
+}
+
+// ── Glossary tooltips for AI terms (atomiks/tippyjs) ──
+// Terms are plain text until this runs; then they become focusable and show a short definition.
+const GLOSSARY = {
+  rag: ['RAG', 'Retrieval-Augmented Generation: the model answers from passages retrieved from your own documents, so responses stay grounded and can cite sources.'],
+  ragas: ['RAGAS', 'An open-source framework that scores RAG pipelines from 0 to 1 on metrics such as faithfulness, answer relevancy and context precision.'],
+  hybrid: ['Hybrid retrieval', 'Combines keyword search (BM25) with semantic vector search, so results match both exact terms and meaning.'],
+  bm25: ['BM25', 'A classic keyword-ranking algorithm. It catches exact terms (names, IDs, codes) that embedding search can miss.'],
+  rrf: ['Reciprocal Rank Fusion', 'Merges ranked results from several retrievers into one list, rewarding passages that rank well in any of them.'],
+  recall: ['Recall@5', 'How often the right passage appears among the top 5 retrieved results.'],
+  crossencoder: ['Cross-encoder reranking', 'A model that reads the question and each candidate passage together to re-score the top results more precisely than embeddings alone.'],
+  nli: ['NLI', 'Natural Language Inference: checks whether an answer is actually supported by the retrieved text, so unsupported claims can be flagged as likely hallucinations.'],
+  relevancy: ['Answer relevancy', 'How directly the answer addresses the question that was asked.'],
+  faithfulness: ['Faithfulness', 'The share of the answer’s claims that are supported by the retrieved context.'],
+  precision: ['Context precision', 'Whether the passages that matter are ranked near the top of the retrieved context.'],
+  react: ['ReAct', 'An agent pattern that alternates reasoning steps with tool calls (“Reason + Act”) until it can answer.'],
+  pii: ['PII', 'Personally identifiable information: names, emails, phone numbers, account IDs and similar data.'],
+  dan: ['DAN jailbreaks', '“Do Anything Now” prompts, a well-known family of jailbreaks that try to talk a model out of its safety rules.'],
+  redteam: ['Red-teaming', 'Adversarial testing: deliberately attacking a system with jailbreaks and prompt injections to find weaknesses before real users do.'],
+  pgvector: ['pgvector', 'A PostgreSQL extension that stores embeddings and runs vector similarity search inside the database.'],
+  otel: ['OpenTelemetry', 'An open standard for traces, metrics and logs, used to follow each request or agent run end to end.'],
+};
+function initGlossary() {
+  if (!window.tippy) return;
+  const terms = Array.from(document.querySelectorAll('.term[data-term]')).filter((el) => GLOSSARY[el.dataset.term]);
+  terms.forEach((el) => el.setAttribute('tabindex', '0'));
+  window.tippy(terms, {
+    content: (el) => { const [title, text] = GLOSSARY[el.dataset.term]; return `<strong>${title}</strong>${text}`; },
+    allowHTML: true,
+    maxWidth: 300,
+    delay: [80, 0],
+    duration: reduceMotion() ? 0 : [180, 120],
+    appendTo: () => document.body,
+  });
+  root.classList.add('has-glossary');
+}
+
+// ── Animated section headings (GSAP SplitText) ──
+// Characters rise out of a per-line mask as each heading scrolls in. Runs only where the GSAP motion layer is on.
+function initHeadings() {
+  if (!window.SplitText || !root.classList.contains('has-gsap')) return;
+  gsap.registerPlugin(SplitText);
+  const split = () => document.querySelectorAll('.section-title, .oss-title').forEach((title) => {
+    title.classList.add('is-split');
+    SplitText.create(title, {
+      type: 'lines, words, chars',
+      mask: 'lines',
+      autoSplit: true,
+      onSplit: (self) => gsap.from(self.chars, {
+        yPercent: 120,
+        duration: 0.9,
+        ease: 'power4.out',
+        stagger: 0.018,
+        scrollTrigger: { trigger: title, start: 'top 88%', once: true },
+      }),
+    });
+  });
+  if (document.fonts) document.fonts.ready.then(split); else split();
+}
+
+// ── Phones: swipeable project carousel (davidjerleke/embla-carousel) ──
+// Active below 720px only; wider screens keep the grid. The project filter hands it the visible cards.
+function initCarousel() {
+  const viewport = document.getElementById('projectsViewport');
+  const controls = document.getElementById('projectsControls');
+  if (!viewport || !controls || !window.EmblaCarousel) return;
+  const grid = document.getElementById('projectsGrid');
+  const dots = controls.querySelector('.carousel-dots');
+  const count = controls.querySelector('.carousel-count');
+  const prev = controls.querySelector('[data-dir="prev"]');
+  const next = controls.querySelector('[data-dir="next"]');
+  const phone = window.matchMedia('(max-width: 720px)');
+  const visibleCards = () => Array.from(grid.children).filter((card) => !card.classList.contains('filtered-out'));
+  root.classList.add('has-carousel');
+  const embla = window.EmblaCarousel(viewport, {
+    align: 'start',
+    containScroll: 'trimSnaps',
+    slides: visibleCards(),
+    active: false,
+    breakpoints: { '(max-width: 720px)': { active: true } },
+  });
+
+  const updateState = () => {
+    const current = embla.selectedScrollSnap();
+    Array.from(dots.children).forEach((dot, i) => {
+      if (i === current) dot.setAttribute('aria-current', 'true'); else dot.removeAttribute('aria-current');
+    });
+    count.textContent = `${current + 1} / ${dots.children.length}`;
+    prev.disabled = !embla.canScrollPrev();
+    next.disabled = !embla.canScrollNext();
+  };
+  const build = () => {
+    const active = phone.matches;
+    controls.hidden = !active;
+    if (!active) {
+      ['role', 'aria-roledescription', 'aria-label'].forEach((attr) => viewport.removeAttribute(attr));
+      return;
+    }
+    viewport.setAttribute('role', 'region');
+    viewport.setAttribute('aria-roledescription', 'carousel');
+    viewport.setAttribute('aria-label', 'Featured projects');
+    // Cards arrive sideways here, so skip their scroll-reveal fade
+    visibleCards().forEach((card) => card.classList.add('is-visible'));
+    dots.innerHTML = embla.scrollSnapList()
+      .map((_, i) => `<button type="button" class="carousel-dot" aria-label="Go to project ${i + 1}"></button>`).join('');
+    updateState();
+  };
+
+  embla.on('init', build).on('reInit', build).on('resize', build).on('select', updateState);
+  prev.addEventListener('click', () => embla.scrollPrev());
+  next.addEventListener('click', () => embla.scrollNext());
+  dots.addEventListener('click', (e) => {
+    const dot = e.target.closest('.carousel-dot');
+    if (dot) embla.scrollTo(Array.from(dots.children).indexOf(dot));
+  });
+  projectsCarousel = {
+    refresh() {
+      if (!phone.matches) return;
+      embla.reInit({ slides: visibleCards() });
+      embla.scrollTo(0, true);
+    },
+  };
+  phone.addEventListener('change', () => { projectsCarousel.refresh(); build(); });
+  build();
+}
+
 // ── Enhancements bootstrap ───────────────
 window.addEventListener('DOMContentLoaded', () => {
   initMotion();
+  initHeadings();
   initGlobe();
   initCommandPalette();
+  initZoom();
+  initGlossary();
+  initCarousel();
 });
 
 // ── Footer year ──────────────────────────
