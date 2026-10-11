@@ -176,8 +176,6 @@ button { font: inherit; color: inherit; }
   white-space: nowrap;
 }
 
-.nowrap { white-space: nowrap; }
-
 .skip-link {
   position: fixed;
   top: 12px;
@@ -2763,11 +2761,11 @@ ninja-keys {
       <button type="button" class="icon-btn" data-dir="next" aria-label="Next project"><svg class="icon i-arrow-right" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
     </div>
 
-    <!-- Enterprise Multi-Cloud CI/CD (closing spotlight) -->
+    <!-- Enterprise Multi-Cloud (closing spotlight) -->
     <div class="spotlight-wrap reveal">
         <article class="project project--spotlight project--closing card lift spot tone-cyan" data-categories="devtools">
-          <button type="button" class="shot spotlight-shot" aria-label="Enlarge screenshot: Enterprise Multi-Cloud CI/CD">
-            <img src="images/projects/multi-cloud-cicd.webp" data-zoom-src="images/projects/multi-cloud-cicd@2x.webp" alt="GitHub Actions run for Enterprise Multi-Cloud CI/CD: every job passed, from lint and tests to OpenTofu validation for Azure and GCP, Trivy scans and the container smoke test" width="800" height="500" loading="lazy" decoding="async"/>
+          <button type="button" class="shot spotlight-shot" aria-label="Enlarge screenshot: Enterprise Multi-Cloud">
+            <img src="images/projects/multi-cloud-cicd.webp" data-zoom-src="images/projects/multi-cloud-cicd@2x.webp" alt="GitHub Actions run for Enterprise Multi-Cloud: every job passed, from lint and tests to OpenTofu validation for Azure and GCP, Trivy scans and the container smoke test" width="800" height="500" loading="lazy" decoding="async"/>
             <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
           </button>
           <div class="spotlight-main">
@@ -2775,19 +2773,20 @@ ninja-keys {
               <span class="icon-tile"><svg class="icon i-workflow" aria-hidden="true"><use href="#i-workflow"/></svg></span>
               <span class="project-cat">CI/CD · Multi-cloud</span>
             </div>
-            <h3 class="project-title">Enterprise <span class="nowrap">Multi-Cloud</span> CI/CD</h3>
+            <h3 class="project-title">Enterprise Multi-Cloud</h3>
             <ul class="project-bullets">
               <li>One pipeline ships the same Flask service to Google Cloud Run or Azure Container Apps, provisioned with <span class="term" data-term="opentofu">OpenTofu</span></li>
               <li>Deployments sign in with GitHub <span class="term" data-term="oidc">OIDC</span>, so no cloud keys are stored, and finish only when the live service reports the deployed commit</li>
-              <li>Every pull request is gated by tests, linters and Trivy image and IaC scans, with every action pinned to a commit SHA; prod ships only from main</li>
+              <li>Pull requests pass the shared CI that all my repositories use: tests, linters and Trivy image and IaC scans, with every action pinned to a commit SHA; prod ships only from main</li>
             </ul>
             <ul class="chips project-stack">
               <li class="chip">GitHub Actions</li><li class="chip">OpenTofu</li><li class="chip">Docker</li><li class="chip">Google Cloud Run</li>
               <li class="chip">Azure Container Apps</li><li class="chip">Python</li><li class="chip">gunicorn</li><li class="chip">Trivy</li>
             </ul>
             <div class="project-actions">
-              <a href="https://github.com/Naresh1401/enterprise-multi-cloud-cicd" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
-              <a href="https://github.com/Naresh1401/enterprise-multi-cloud-cicd/actions" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Pipeline runs</a>
+              <a href="https://github.com/Naresh1401/enterprise-multi-cloud" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+              <a href="https://github.com/Naresh1401/enterprise-multi-cloud/actions" target="_blank" rel="noopener" class="link-btn link-btn--accent"><svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg> Pipeline runs</a>
+              <a href="https://github.com/Naresh1401/github-cicd-workflows" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-workflow" aria-hidden="true"><use href="#i-workflow"/></svg> Shared CI</a>
             </div>
           </div>
           <div class="spotlight-panel">
@@ -3755,11 +3754,11 @@ function timeAgo(dateStr) {
 const NAME_WORDS = {
   ai: 'AI', llm: 'LLM', rag: 'RAG', sql: 'SQL', api: 'API', ml: 'ML', nlp: 'NLP', erp: 'ERP', hr: 'HR',
   mcp: 'MCP', ucp: 'UCP', iot: 'IoT', saas: 'SaaS', ga4: 'GA4', cicd: 'CI/CD', bigquery: 'BigQuery',
-  powerbi: 'Power BI', brd: 'BRD', ab: 'A/B',
+  powerbi: 'Power BI', brd: 'BRD', ab: 'A/B', github: 'GitHub',
 };
 const SMALL_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs']);
 // Names the word-by-word casing gets wrong
-const REPO_TITLES = { 'enterprise-multi-cloud-cicd': 'Enterprise Multi-Cloud CI/CD' };
+const REPO_TITLES = { 'enterprise-multi-cloud': 'Enterprise Multi-Cloud' };
 function prettyRepoName(name) {
   if (REPO_TITLES[name]) return REPO_TITLES[name];
   return name.split(/[-_]+/).filter(Boolean).map((word, i) => {
