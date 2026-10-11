@@ -10,6 +10,8 @@
   var root = document.documentElement;
   var theme;
   root.classList.add('js');
+  // Arriving at a #section: jump there instantly so the page can keep it in place
+  if (location.hash) root.classList.add('instant-jump');
   try { theme = localStorage.getItem('theme'); } catch (e) {}
   if (theme !== 'light' && theme !== 'dark') {
     theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -126,6 +128,8 @@ html {
   text-size-adjust: 100%;
   scrollbar-color: var(--on-ground) var(--ground);
 }
+
+html.instant-jump { scroll-behavior: auto; }
 
 body {
   background: var(--ground);
@@ -831,6 +835,7 @@ input, textarea { caret-color: var(--title-ink); }
 .skeleton { display: block; height: 12px; margin: 6px 0; background: var(--skeleton); }
 .skeleton-title { width: 55%; height: 18px; }
 .skeleton-line-80 { width: 80%; }
+.skeleton-meta { width: 40%; margin-top: 14px; }
 
 .gh-error {
   display: flex;
@@ -1731,19 +1736,27 @@ ninja-keys {
           </div>
           <div class="gh-panel">
             <h4 class="gh-panel-title">Recent activity</h4>
+            <!-- Placeholders match the five rows that load, so the page does not jump when they arrive -->
             <ol class="activity" id="ghActivity">
-              <li class="activity-item"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
-              <li class="activity-item"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
+              <li class="activity-item" aria-hidden="true"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
+              <li class="activity-item" aria-hidden="true"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
+              <li class="activity-item" aria-hidden="true"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
+              <li class="activity-item" aria-hidden="true"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
+              <li class="activity-item" aria-hidden="true"><span></span><span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></span><span></span></li>
             </ol>
           </div>
         </div>
         <div class="repo-block">
           <h4 class="gh-panel-title">Latest repositories</h4>
           <div class="repo-list" id="ghRepos">
-            <div class="repo"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></div>
-            <div class="repo"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></div>
-            <div class="repo"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></div>
-            <div class="repo"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
+            <div class="repo" aria-hidden="true"><span class="skeleton skeleton-title"></span><span class="skeleton"></span><span class="skeleton skeleton-line-80"></span><span class="skeleton skeleton-meta"></span></div>
           </div>
         </div>
       </div>
@@ -2082,6 +2095,30 @@ function scrollToTarget(el) {
   if (el) el.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth' });
 }
 
+// ── Arriving at a #section ───────────────
+// The GitHub data, web fonts and the phone carousel all change height after the browser
+// has jumped to the section, which would leave the visitor looking at the wrong part of the
+// page. Until they scroll, tap or press a key, put the section back under the header.
+let anchorPinned = Boolean(location.hash);
+function releaseAnchor() {
+  anchorPinned = false;
+  root.classList.remove('instant-jump');
+}
+if (anchorPinned) {
+  ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((type) => {
+    window.addEventListener(type, releaseAnchor, { once: true, passive: true, capture: true });
+  });
+}
+function keepAnchorInView() {
+  if (!anchorPinned) return;
+  let id = location.hash.slice(1);
+  try { id = decodeURIComponent(id); } catch { /* keep the raw fragment */ }
+  const target = document.getElementById(id);
+  if (target) requestAnimationFrame(() => { if (anchorPinned) target.scrollIntoView({ block: 'start' }); });
+}
+window.addEventListener('load', keepAnchorInView);
+if (document.fonts) document.fonts.ready.then(keepAnchorInView);
+
 // ── Theme toggle ─────────────────────────
 // data-theme is already set pre-paint by the inline script in <head>; this just wires the button.
 const THEME_COLOR = { light: '#f2a900', dark: '#121212' };
@@ -2310,7 +2347,10 @@ const NAME_WORDS = {
   powerbi: 'Power BI', brd: 'BRD', ab: 'A/B',
 };
 const SMALL_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs']);
+// Names the word-by-word casing gets wrong
+const REPO_TITLES = { 'enterprise-multi-cloud-cicd': 'Enterprise Multi-Cloud CI/CD' };
 function prettyRepoName(name) {
+  if (REPO_TITLES[name]) return REPO_TITLES[name];
   return name.split(/[-_]+/).filter(Boolean).map((word, i) => {
     const lower = word.toLowerCase();
     if (NAME_WORDS[lower]) return NAME_WORDS[lower];
@@ -2447,7 +2487,7 @@ async function loadGitHub() {
   container.innerHTML = '';
   repos.filter(r => !EXCLUDE_REPOS.has(r.name)).slice(0, 8).forEach(repo => container.appendChild(renderRepo(repo)));
 }
-loadGitHub();
+loadGitHub().finally(keepAnchorInView);
 
 // ── GitHub Recent Activity ───────────────
 const GH_ACTIVITY_CACHE_KEY = 'gh_activity_cache_v1';
@@ -2519,7 +2559,7 @@ async function loadGitHubActivity() {
       <time class="activity-time" datetime="${escapeHtml(ev.created_at)}">${timeAgo(ev.created_at)}</time>
     </li>`).join('');
 }
-loadGitHubActivity();
+loadGitHubActivity().finally(keepAnchorInView);
 
 // ── Résumé button ────────────────────────
 // Only revealed once resume.pdf is actually deployed, so visitors never hit a 404
@@ -2592,6 +2632,7 @@ async function loadContributions() {
     document.getElementById('ghContribCount').textContent = total.toLocaleString('en-US');
     tile.hidden = false;
   }
+  keepAnchorInView();
 }
 loadContributions();
 
