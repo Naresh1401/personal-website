@@ -2765,7 +2765,7 @@ ninja-keys {
     <div class="spotlight-wrap reveal">
         <article class="project project--spotlight project--closing card lift spot tone-cyan" data-categories="devtools">
           <button type="button" class="shot spotlight-shot" aria-label="Enlarge screenshot: Enterprise Multi-Cloud">
-            <img src="images/projects/multi-cloud-cicd.webp" data-zoom-src="images/projects/multi-cloud-cicd@2x.webp" alt="GitHub Actions run for Enterprise Multi-Cloud: every job passed, from lint and tests to OpenTofu validation for Azure and GCP, Trivy scans and the container smoke test" width="800" height="500" loading="lazy" decoding="async"/>
+            <img src="images/projects/multi-cloud-cicd.webp" data-zoom-src="images/projects/multi-cloud-cicd@2x.webp" alt="GitHub Actions run for Enterprise Multi-Cloud: every check passed, from lint and tests to nine OpenTofu validations, the image build, the Helm chart's kind install and Trivy scans, ending in the CI passed check" width="800" height="500" loading="lazy" decoding="async"/>
             <span class="shot-hint" aria-hidden="true"><svg class="icon i-maximize-2"><use href="#i-maximize-2"/></svg> Enlarge</span>
           </button>
           <div class="spotlight-main">
@@ -2775,13 +2775,13 @@ ninja-keys {
             </div>
             <h3 class="project-title">Enterprise Multi-Cloud</h3>
             <ul class="project-bullets">
-              <li>One pipeline ships the same Flask service to Google Cloud Run or Azure Container Apps, provisioned with <span class="term" data-term="opentofu">OpenTofu</span></li>
-              <li>Deployments sign in with GitHub <span class="term" data-term="oidc">OIDC</span>, so no cloud keys are stored, and finish only when the live service reports the deployed commit</li>
-              <li>Pull requests pass the shared CI that all my repositories use: tests, linters and Trivy image and IaC scans, with every action pinned to a commit SHA; prod ships only from main</li>
+              <li>One pipeline ships the same Flask service to AWS, Google Cloud and Azure: ECS, Cloud Run and Container Apps, or EKS, GKE and AKS through one Helm chart, all provisioned with <span class="term" data-term="opentofu">OpenTofu</span></li>
+              <li>Every target gets a private PostgreSQL that the service signs in to with its cloud identity, never a password, and a migration job with its own identity updates the schema before each release</li>
+              <li>Deployments sign in with GitHub <span class="term" data-term="oidc">OIDC</span>, so no cloud keys are stored, and finish only when the live service reports the deployed commit and a working database; prod ships only from main, after approval</li>
             </ul>
             <ul class="chips project-stack">
-              <li class="chip">GitHub Actions</li><li class="chip">OpenTofu</li><li class="chip">Docker</li><li class="chip">Google Cloud Run</li>
-              <li class="chip">Azure Container Apps</li><li class="chip">Python</li><li class="chip">gunicorn</li><li class="chip">Trivy</li>
+              <li class="chip">GitHub Actions</li><li class="chip">OpenTofu</li><li class="chip">Kubernetes</li><li class="chip">Helm</li><li class="chip">PostgreSQL</li>
+              <li class="chip">AWS</li><li class="chip">Google Cloud</li><li class="chip">Azure</li><li class="chip">Docker</li><li class="chip">Trivy</li>
             </ul>
             <div class="project-actions">
               <a href="https://github.com/Naresh1401/enterprise-multi-cloud" target="_blank" rel="noopener" class="link-btn"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
@@ -2792,16 +2792,16 @@ ninja-keys {
           <div class="spotlight-panel">
             <p class="panel-title"><span>Pull request gates</span><span>6 checks</span></p>
             <ul class="gate-list">
-              <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>Lint, test and audit</li>
+              <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>Lint, tests on PostgreSQL, audit</li>
               <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>Workflow, script and Dockerfile lint</li>
-              <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>OpenTofu validate (Azure)</li>
-              <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>OpenTofu validate (GCP)</li>
+              <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>OpenTofu validate, all six targets</li>
               <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>Trivy IaC scan</li>
               <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>Image build, smoke test and scan</li>
+              <li class="gate"><svg class="icon i-circle-check" aria-hidden="true"><use href="#i-circle-check"/></svg>Helm chart on kind with a database</li>
             </ul>
             <div class="panel-stat">
               <span class="metric-num">Zero</span>
-              <span class="metric-label">stored cloud keys: GitHub OIDC signs in instead</span>
+              <span class="metric-label">stored cloud keys or service passwords: identities sign in instead</span>
             </div>
           </div>
         </article>
