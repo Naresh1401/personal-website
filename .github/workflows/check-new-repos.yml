@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   issues: write
-  pull-requests: write
 
 jobs:
   check-new-repos:
@@ -17,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Check for new repos and open PR
+      - name: Check for new repos
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -25,7 +24,7 @@ jobs:
           KNOWN_FILE=".known_repos"
 
           # Fetch all public repo names
-          gh repo list "$OWNER" --visibility=public --limit 100 --json name --jq '.[].name' | sort > /tmp/current_repos.txt
+          gh repo list "$OWNER" --visibility=public --limit 1000 --json name --jq '.[].name' | sort > /tmp/current_repos.txt
 
           # Load known repos (or empty if first run)
           if [ -f "$KNOWN_FILE" ]; then
@@ -41,7 +40,7 @@ jobs:
             echo "New repositories detected:"
             echo "$NEW_REPOS"
 
-            # Build PR/issue body
+            # Build issue body
             BODY="## 🚀 New Repository Detected!\n\nThe following new repositories were found on your GitHub profile:\n\n"
             while IFS= read -r repo; do
               BODY+="- **[$repo](https://github.com/$OWNER/$repo)**\n"
@@ -49,36 +48,33 @@ jobs:
 
             BODY+="\n### Action Required\n"
             BODY+="Would you like to add these project(s) to your portfolio website?\n\n"
-            BODY+="If yes, update \`index.html\` with the project details (description, tech stack, highlights) as part of reviewing this PR.\n\n"
-            BODY+="Merging this PR only updates the tracked-repos list (\`.known_repos\`) so you don't get re-notified; it does **not** change the live site by itself."
+            BODY+="If yes, update \`index.html\` with the project details (description, tech stack, highlights) and push to \`main\`.\n\n"
+            BODY+="The site will auto-deploy to: **https://${OWNER}.github.io/personal-website/**"
+
+            # One-line title: issue titles can't hold newlines and stop at 256 characters
+            COUNT=$(grep -c . <<< "$NEW_REPOS")
+            NAMES=$(head -n 3 <<< "$NEW_REPOS" | paste -sd ',' - | sed 's/,/, /g')
+            if [ "$COUNT" -gt 3 ]; then NAMES+=" and $((COUNT - 3)) more"; fi
+            if [ "$COUNT" -gt 1 ]; then TITLE="📦 New repos detected: $NAMES"; else TITLE="📦 New repo detected: $NAMES"; fi
 
             # Create portfolio-update label if it doesn't exist
             gh label create "portfolio-update" --repo "$OWNER/personal-website" --color "0E8A16" --description "New repo to potentially add to portfolio" 2>/dev/null || true
 
-            # Create GitHub issue for visibility
+            # Create GitHub issue
             echo -e "$BODY" | gh issue create \
               --repo "$OWNER/personal-website" \
-              --title "📦 New repo detected: $NEW_REPOS" \
+              --title "$TITLE" \
               --body-file -  \
               --label "portfolio-update"
 
-            # Open a PR (instead of pushing to main directly) so the update can be reviewed/approved
-            BRANCH="bot/known-repos-update-${{ github.run_id }}"
+            # Update known repos so we don't alert again. Committed straight to main: this repo
+            # doesn't let Actions open pull requests, and the issue above is the review step.
             cp /tmp/current_repos.txt "$KNOWN_FILE"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git checkout -b "$BRANCH"
             git add "$KNOWN_FILE"
             git commit -m "chore: update known repos list"
-            git push origin "$BRANCH"
-
-            echo -e "$BODY" | gh pr create \
-              --repo "$OWNER/personal-website" \
-              --title "chore: update known repos list ($NEW_REPOS)" \
-              --body-file - \
-              --base main \
-              --head "$BRANCH" \
-              --label "portfolio-update"
+            git push
           else
             echo "No new repositories found."
           fi
