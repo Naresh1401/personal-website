@@ -3932,8 +3932,18 @@ function describeEvent(ev) {
       const n = ev.payload?.size ?? ev.payload?.commits?.length;
       return n ? `Pushed ${n} commit${n > 1 ? 's' : ''} to ${repoLink}` : `Pushed to ${repoLink}`;
     }
-    case 'PullRequestEvent':
-      return `${ev.payload?.action === 'opened' ? 'Opened' : 'Updated'} a pull request in ${repoLink}`;
+    case 'PullRequestEvent': {
+      // The Events API sends opened, closed, reopened or merged (older payloads mark a merge as
+      // closed with merged: true), plus the number but no title
+      const pr = ev.payload?.pull_request || {};
+      const action = ev.payload?.action === 'closed' && pr.merged ? 'merged' : ev.payload?.action;
+      const verb = { opened: 'Opened', closed: 'Closed', reopened: 'Reopened', merged: 'Merged' }[action] || 'Updated';
+      const n = ev.payload?.number ?? pr.number;
+      const prLink = n
+        ? ` <a href="${safeUrl(`https://github.com/${ev.repo.name}/pull/${n}`)}" target="_blank" rel="noopener">#${escapeHtml(String(n))}</a>`
+        : '';
+      return `${verb} pull request${prLink} in ${repoLink}`;
+    }
     case 'CreateEvent': {
       const ref = ev.payload?.ref ? ` <code>${escapeHtml(ev.payload.ref)}</code>` : '';
       return `Created ${escapeHtml(ev.payload?.ref_type || 'repo')}${ref} in ${repoLink}`;
