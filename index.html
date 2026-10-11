@@ -694,6 +694,17 @@ input, textarea { caret-color: var(--title-ink); }
 .project--lead .shot img { height: 100%; aspect-ratio: auto; }
 .project--lead .project-body { padding: 22px 26px 24px; }
 .project--lead .project-title { font-size: clamp(1.625rem, 2.6vw, 2.25rem); }
+
+/* The closing project spans the catalog, mirroring the lead with its screenshot on the right */
+.project--wide {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+}
+
+.project--wide .shot { order: 2; height: 100%; border-bottom: 0; border-left: 3px solid var(--rule); }
+.project--wide .shot img { height: 100%; aspect-ratio: auto; }
+.project--wide .project-body { padding: 22px 26px 24px; }
 .eval { margin-top: 16px; border-top: var(--bar-mid) solid var(--rule); }
 
 .eval-head {
@@ -1197,6 +1208,9 @@ ninja-keys {
   .project--lead { grid-template-columns: minmax(0, 1fr); }
   .project--lead .shot { border-right: 0; border-bottom: 3px solid var(--rule); }
   .project--lead .shot img { aspect-ratio: 16 / 10; }
+  .project--wide { grid-template-columns: minmax(0, 1fr); }
+  .project--wide .shot { order: 0; border-bottom: 3px solid var(--rule); border-left: 0; }
+  .project--wide .shot img { aspect-ratio: 16 / 10; }
   .stack-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -1492,12 +1506,12 @@ ninja-keys {
     <div class="projects-toolbar">
       <div class="filter-bar" id="projectFilterBar" role="group" aria-label="Filter projects by category">
         <span class="filter-indicator" aria-hidden="true"></span>
-        <button class="filter-btn active" data-filter="all" aria-pressed="true">All <span class="filter-count">7</span></button>
+        <button class="filter-btn active" data-filter="all" aria-pressed="true">All <span class="filter-count">8</span></button>
         <button class="filter-btn" data-filter="rag" aria-pressed="false">RAG <span class="filter-count">2</span></button>
         <button class="filter-btn" data-filter="agents" aria-pressed="false">Agents <span class="filter-count">4</span></button>
         <button class="filter-btn" data-filter="safety" aria-pressed="false">Safety <span class="filter-count">1</span></button>
         <button class="filter-btn" data-filter="data" aria-pressed="false">Data / SQL <span class="filter-count">3</span></button>
-        <button class="filter-btn" data-filter="devtools" aria-pressed="false">Dev Tools <span class="filter-count">1</span></button>
+        <button class="filter-btn" data-filter="devtools" aria-pressed="false">Dev Tools <span class="filter-count">2</span></button>
       </div>
       <p class="demo-note"><svg class="icon i-info" aria-hidden="true"><use href="#i-info"/></svg> Live demos run on free-tier hosting and may take about 30 seconds to wake up on first load.</p>
     </div>
@@ -1657,6 +1671,27 @@ ninja-keys {
             <div class="project-actions">
               <a href="https://github.com/Naresh1401/agent-erp" target="_blank" rel="noopener" class="btn btn-sm"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
               <a href="https://agent-erp-3osf.onrender.com" target="_blank" rel="noopener" class="btn btn-primary btn-sm" data-demo>Live demo <svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project project--wide" id="project-multi-cloud-cicd" data-categories="devtools">
+          <button type="button" class="shot" aria-label="Enlarge screenshot: Enterprise Multi-Cloud CI/CD">
+            <img src="images/projects/multi-cloud-cicd.webp" srcset="images/projects/multi-cloud-cicd.webp 800w, images/projects/multi-cloud-cicd@2x.webp 1600w" sizes="(min-width: 1240px) 650px, (min-width: 1101px) 52vw, 92vw" data-zoom-src="images/projects/multi-cloud-cicd@2x.webp" alt="GitHub Actions run for Enterprise Multi-Cloud CI/CD: every job passed, from lint and tests to OpenTofu validation for Azure and GCP, Trivy scans and the container smoke test" width="800" height="500" loading="lazy" decoding="async"/>
+          </button>
+          <div class="project-body">
+            <h3 class="project-title">Enterprise Multi-Cloud CI/CD</h3>
+            <p class="project-cat">CI/CD · Multi-cloud</p>
+            <p class="project-metric"><span class="metric-val">0</span><span class="metric-label">stored cloud keys: GitHub <span class="term" data-term="oidc">OIDC</span> signs deployments in to both Google Cloud and Azure</span></p>
+            <ul class="project-points">
+              <li>One pipeline ships the same Flask service to Google Cloud Run or Azure Container Apps, provisioned with <span class="term" data-term="opentofu">OpenTofu</span></li>
+              <li>Every pull request runs ruff, pytest, pip-audit, actionlint, hadolint and Trivy image and IaC scans, with every action pinned to a commit SHA</li>
+              <li>A deployment finishes only when the live /health endpoint reports the deployed commit; prod ships only from main</li>
+            </ul>
+            <p class="project-stack"><b>Built with</b> GitHub Actions, OpenTofu, Docker, Google Cloud Run, Azure Container Apps, Python, Flask, gunicorn, Trivy</p>
+            <div class="project-actions">
+              <a href="https://github.com/Naresh1401/enterprise-multi-cloud-cicd" target="_blank" rel="noopener" class="btn btn-sm"><svg class="icon i-github" aria-hidden="true"><use href="#i-github"/></svg> GitHub</a>
+              <a href="https://github.com/Naresh1401/enterprise-multi-cloud-cicd/actions" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Pipeline runs <svg class="icon i-arrow-up-right" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
             </div>
           </div>
         </article>
@@ -2652,6 +2687,8 @@ const GLOSSARY = {
   redteam: ['Red-teaming', 'Adversarial testing: deliberately attacking a system with jailbreaks and prompt injections to find weaknesses before real users do.'],
   pgvector: ['pgvector', 'A PostgreSQL extension that stores embeddings and runs vector similarity search inside the database.'],
   otel: ['OpenTelemetry', 'An open standard for traces, metrics and logs, used to follow each request or agent run end to end.'],
+  oidc: ['OIDC', 'OpenID Connect: GitHub gives each workflow run a short-lived signed token that the cloud trusts directly, so no long-lived keys are stored.'],
+  opentofu: ['OpenTofu', 'An open-source fork of Terraform: cloud infrastructure is written as code and applied the same way every time.'],
 };
 function initGlossary() {
   if (!window.tippy) return;
