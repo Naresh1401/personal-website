@@ -21,7 +21,7 @@ Enhanced personal portfolio website with **automated deployment** and **reposito
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `deploy.yml` | Push/PR to `main` | Lints HTML/CSS (`validate` job), then deploys to GitHub Pages on push (PRs only run validation) |
+| `deploy.yml` | Push/PR to `main` | Lints HTML/CSS and the workflows with the shared checks from [github-cicd-workflows](https://github.com/Naresh1401/github-cicd-workflows), then deploys to GitHub Pages on push (PRs only run the checks) |
 | `check-new-repos.yml` | Daily cron (9 AM UTC) | Detects new repos, files an issue suggesting them for the portfolio, and records them in `.known_repos` |
 
 ## Local Development

@@ -17,23 +17,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Shared checks from https://github.com/Naresh1401/github-cicd-workflows
   validate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-      - name: Lint HTML/CSS
-        run: npm run lint
+    name: Lint HTML and CSS
+    uses: Naresh1401/github-cicd-workflows/.github/workflows/node-ci.yml@v1
+    with:
+      node-version: "20"
+
+  repo-lint:
+    name: Repository lint
+    uses: Naresh1401/github-cicd-workflows/.github/workflows/repo-lint.yml@v1
 
   deploy:
-    needs: validate
+    needs: [validate, repo-lint]
     if: github.event_name != 'pull_request'
     environment:
       name: github-pages
