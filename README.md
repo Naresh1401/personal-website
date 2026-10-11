@@ -11,8 +11,8 @@ Enhanced personal portfolio website with **automated deployment** and **reposito
 
 ## Features
 
-- Animated aurora hero with a live "agent console", glass nav and light/dark themes
-- Responsive project gallery with category filters, headline metrics and live demo links
+- A facts-label hero: measured results grouped by project, each linked to the project that produced it, with light and dark themes
+- Project catalog with category filters, headline metrics, enlargeable live-demo screenshots and a swipeable phone carousel
 - Live GitHub stats, languages, activity and latest repos (cached to stay under the API rate limit)
 - Automated GitHub Pages deployment via GitHub Actions
 - **Daily repo monitor** — automatically detects new repos and creates GitHub issues suggesting portfolio additions
@@ -38,13 +38,12 @@ Run `npm run lint` before pushing — the same check runs in CI and blocks deplo
 
 ## Tech Stack
 
-- **HTML5** + **CSS3** (mesh gradients, custom properties)
+- **HTML5** + **CSS3** (custom properties, CSS scroll-driven animation, view transitions)
 - **JavaScript** (vanilla)
-- **Google Fonts**: Syne, Geist, Geist Mono
+- **Archivo** variable font (SIL OFL), self-hosted in `fonts/`
 - **Icons**: inline SVG sprite from Lucide, Bootstrap Icons (GitHub/LinkedIn) and Simple Icons (ORCID)
-- **GSAP + ScrollTrigger** and **Lenis** for scroll motion and smooth scrolling (CDN, with SRI)
-- **cobe** (globe) and **ninja-keys** (⌘K palette), self-hosted in `vendor/`
-- **Tippy.js** (glossary tooltips), **medium-zoom** (screenshot zoom), **Embla Carousel** (projects on phones) and GSAP **SplitText** (heading reveals)
+- **ninja-keys** (⌘K palette) and **Motion** (spring micro-interactions and scroll progress; the vanilla build of Framer Motion), self-hosted in `vendor/`
+- **Tippy.js** (glossary tooltips), **medium-zoom** (screenshot zoom) and **Embla Carousel** (projects on phones), from CDNs with SRI
 - **GitHub Actions** for CI/CD
 - **GitHub Pages** for hosting
 
@@ -58,7 +57,8 @@ personal-website/
 ├── 404.html                            # Custom GitHub Pages 404
 ├── og-image.png                        # Social sharing preview image
 ├── images/projects/                    # Live-demo screenshots (WebP thumbnail + @2x zoom)
-├── vendor/                             # Self-hosted cobe + ninja-keys bundles
+├── fonts/                              # Self-hosted Archivo variable font + OFL licence
+├── vendor/                             # Self-hosted ninja-keys and Motion bundles
 ├── .known_repos                        # Tracked repos for change detection
 ├── package.json                        # Local lint/serve scripts
 ├── .stylelintrc.json / .htmlvalidate.json
