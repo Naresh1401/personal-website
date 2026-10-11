@@ -9,114 +9,117 @@
   var theme;
   try { theme = localStorage.getItem('theme'); } catch (e) {}
   if (theme !== 'light' && theme !== 'dark') {
-    theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
   document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
-<title>404 — Page Not Found | Naresh Sampangi</title>
+<title>Page not found | Naresh Sampangi</title>
 <meta name="robots" content="noindex"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2338bdf8'/><stop offset='.45' stop-color='%2360a5fa'/><stop offset='1' stop-color='%23a78bfa'/></linearGradient></defs><rect width='64' height='64' rx='16' fill='url(%23g)'/><text x='32' y='41' font-family='Arial Black,Arial,sans-serif' font-size='24' font-weight='900' text-anchor='middle' fill='%23070b16'>NS</text></svg>" type="image/svg+xml"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Syne:wght@800&display=swap" rel="stylesheet"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%23141414'/><text x='32' y='42' font-family='Arial Black,Arial,sans-serif' font-size='26' font-weight='900' text-anchor='middle' fill='%23f2a900'>NS</text></svg>" type="image/svg+xml"/>
+<!-- Absolute paths: GitHub Pages serves this page at whatever URL was missing, at any depth -->
+<link rel="preload" href="/personal-website/fonts/archivo-variable-latin.woff2" as="font" type="font/woff2" crossorigin/>
 <style>
-  :root {
-    --bg: #070b16;
-    --text: #edf2fa;
-    --text-2: #a9b6ca;
-    --line: rgba(148, 163, 184, 0.22);
-    --grid-line: rgba(148, 163, 184, 0.07);
-    --grad: linear-gradient(110deg, #38bdf8 0%, #60a5fa 38%, #a78bfa 100%);
-    --glow: rgba(96, 165, 250, 0.45);
-    --on-accent: #050a14;
-
-    color-scheme: dark;
+  @font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    font-display: swap;
+    src: url('/personal-website/fonts/archivo-variable-latin.woff2') format('woff2');
   }
 
-  :root[data-theme='light'] {
-    --bg: #f6f8fc;
-    --text: #0b1324;
-    --text-2: #3d4a60;
-    --line: rgba(15, 23, 42, 0.16);
-    --grid-line: rgba(15, 23, 42, 0.05);
-    --grad: linear-gradient(110deg, #0284c7 0%, #2563eb 40%, #7c3aed 100%);
-    --glow: rgba(37, 99, 235, 0.3);
-    --on-accent: #ffffff;
+  :root {
+    --ground: #f2a900;
+    --panel: #fcfcfa;
+    --ink: #141414;
+    --ink-2: #4d4a42;
+    --rule: #141414;
+    --accent: #141414;
+    --on-accent: #fcfcfa;
+    --title-ink: #141414;
+    --focus: #141414;
 
     color-scheme: light;
   }
 
-  * { box-sizing: border-box; margin: 0; }
+  :root[data-theme='dark'] {
+    --ground: #121212;
+    --panel: #1b1b1a;
+    --ink: #efefea;
+    --ink-2: #bebcb3;
+    --rule: #efefea;
+    --accent: #f2a900;
+    --on-accent: #141414;
+    --title-ink: #f2a900;
+    --focus: #f2a900;
+
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    min-height: 100vh;
     display: grid;
     place-items: center;
-    padding: 24px;
-    background:
-      radial-gradient(60% 50% at 50% 35%, rgba(96, 165, 250, 0.16), transparent 70%),
-      var(--bg);
-    color: var(--text);
-    font-family: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    text-align: center;
+    min-height: 100dvh;
+    padding: 24px 16px;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.55;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image:
-      linear-gradient(var(--grid-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 56px 56px;
-    -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 20%, transparent 75%);
-    mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 20%, transparent 75%);
+  main { width: min(100%, 560px); padding: 22px 26px 26px; border: 3px solid var(--rule); background: var(--panel); }
+  h1 { color: var(--title-ink); font-size: clamp(2.75rem, 10vw, 4.25rem); font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
+  .serving { margin-top: 14px; font-size: 1.25rem; font-weight: 800; line-height: 1.25; }
+  .bar { height: 12px; margin: 14px 0 0; background: var(--rule); }
+
+  .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 4px;
+    padding: 6px 0 8px;
+    border-bottom: 1px solid var(--rule);
   }
 
-  .code {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(6rem, 24vw, 12rem);
-    font-weight: 800;
-    line-height: 0.9;
-    letter-spacing: -0.05em;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  h1 { margin: 20px 0 10px; font-size: clamp(1.3rem, 4vw, 1.75rem); font-weight: 600; letter-spacing: -0.02em; }
-  p { margin-bottom: 32px; color: var(--text-2); }
-  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .row span { font-weight: 800; }
+  .row strong { font-size: 3rem; font-weight: 900; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+  .note { margin-top: 12px; color: var(--ink-2); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 
   .btn {
     display: inline-flex;
     align-items: center;
-    height: 46px;
+    min-height: 48px;
     padding: 0 22px;
-    border: 1px solid transparent;
-    border-radius: 999px;
-    font-size: 0.92rem;
-    font-weight: 500;
+    border: 2px solid currentcolor;
+    color: inherit;
+    font-weight: 750;
     text-decoration: none;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
+    transition: background-color 0.15s;
   }
-  .btn:hover { transform: translateY(-2px); }
-  .btn-primary { background: var(--grad); color: var(--on-accent); box-shadow: 0 10px 30px -12px var(--glow); }
-  .btn-ghost { border-color: var(--line); color: var(--text); }
-  .btn:focus-visible { outline: 2px solid #60a5fa; outline-offset: 3px; }
+
+  .btn:hover { background: color-mix(in srgb, currentcolor 10%, transparent); }
+  .btn-primary { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+  .btn-primary:hover { background: color-mix(in srgb, var(--accent) 84%, var(--panel)); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  ::selection { background: var(--title-ink); color: var(--panel); }
 </style>
 </head>
 <body>
   <main>
-    <p class="code" aria-hidden="true">404</p>
-    <h1>This page doesn't exist.</h1>
-    <p>The link may be broken, or the page may have moved.</p>
+    <h1>Page not found</h1>
+    <p class="serving">This page doesn't exist.</p>
+    <div class="bar" aria-hidden="true"></div>
+    <p class="row"><span>Status</span><strong>404</strong></p>
+    <p class="note">The link may be broken, or the page may have moved.</p>
     <div class="actions">
       <a class="btn btn-primary" href="/personal-website/">Back to home</a>
-      <a class="btn btn-ghost" href="/personal-website/#projects">View projects</a>
+      <a class="btn" href="/personal-website/#projects">View projects</a>
     </div>
   </main>
 </body>
