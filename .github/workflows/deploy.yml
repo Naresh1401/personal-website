@@ -20,7 +20,7 @@ jobs:
   # Shared checks from https://github.com/Naresh1401/github-cicd-workflows
   validate:
     name: Lint HTML and CSS
-    uses: Naresh1401/github-cicd-workflows/.github/workflows/node-ci.yml@v1
+    uses: Naresh1401/github-cicd-workflows/.github/workflows/node-ci.yml@v2
     with:
       node-version: "20"
 
