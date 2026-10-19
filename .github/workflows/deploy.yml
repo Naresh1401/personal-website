@@ -26,7 +26,7 @@ jobs:
 
   repo-lint:
     name: Repository lint
-    uses: Naresh1401/github-cicd-workflows/.github/workflows/repo-lint.yml@v1
+    uses: Naresh1401/github-cicd-workflows/.github/workflows/repo-lint.yml@v2
 
   deploy:
     needs: [validate, repo-lint]
